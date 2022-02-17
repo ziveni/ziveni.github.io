@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Ziveni</title>
+  <icon>https://ziveni.github.io/icon.png</icon>
+  <subtitle>网站副标题</subtitle>
+  <link href="https://ziveni.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://ziveni.github.io/"/>
+  <updated>2022-02-17T09:51:02.102Z</updated>
+  <id>https://ziveni.github.io/</id>
+  
+  <author>
+    <name>ziveni</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>redis安装部署指南</title>
+    <link href="https://ziveni.github.io/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/"/>
+    <id>https://ziveni.github.io/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/</id>
+    <published>2022-02-17T09:37:26.000Z</published>
+    <updated>2022-02-17T09:51:02.102Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;a href=&quot;#redis在linux下的安装部署，哨兵模式，集群模式&quot; class=&quot;headerlink&quot; title=&quot;redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;/a&gt;redis在linux下的安装部署，哨兵模式，集群模式&lt;/h3&gt;</summary>
+    
+    
+    
+    <category term="redis" scheme="https://ziveni.github.io/categories/redis/"/>
+    
+    
+    <category term="Linux" scheme="https://ziveni.github.io/tags/Linux/"/>
+    
+    <category term="redis" scheme="https://ziveni.github.io/tags/redis/"/>
+    
+  </entry>
+  
+</feed>
