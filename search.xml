@@ -1402,7 +1402,7 @@
 </ul>
 <ol start="3">
 <li><p>使用web查看</p>
-<p><img src="D:\workspace\blog\source_posts\nginx安装指南.assets\1600740689071.png" alt="1600740689071"></p>
+<p><img src="https://gitee.com/zvenw/pics/raw/master/img/image-20220218164305758.png" alt="image-20220218164305758"></p>
 </li>
 </ol>
 ]]></content>
@@ -1574,7 +1574,7 @@
 
 <h4 id="4-2-3-2-使用阿里云的DNS"><a href="#4-2-3-2-使用阿里云的DNS" class="headerlink" title="4.2.3.2 使用阿里云的DNS"></a>4.2.3.2 使用阿里云的DNS</h4><ol>
 <li><p>登录阿里云控制台，获取api秘钥  <a href="https://ak-console.aliyun.com/#/accesskey">Https://ak-console.aliyun.com/#/accesskey</a></p>
-<p><img src="D:\Desktop\学习笔记\nginx\nginx安装配置\nginx配置指南.assets\1602828329608.png" alt="1602828329608"></p>
+<p><img src="https://gitee.com/zvenw/pics/raw/master/img/1602828329608.png" alt="1602828329608"></p>
 </li>
 <li><p>运行以下两行命令</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">export Ali_Key=&quot;111231313&quot;</span><br><span class="line">export Ali_Secret=&quot;Oc53ns30dvP1141414414JgrgI6pkY&quot;</span><br></pre></td></tr></table></figure></li>
@@ -1676,7 +1676,7 @@
 </ul>
 <img src="https://gitee.com/zvenw/pics/raw/master/img/1606276672183.png" alt="1606276672183"  /></li>
 <li><p>安装完成</p>
-<p><img src="D:\Desktop\学习笔记\nginx\nginx安装配置\nginx配置指南.assets\1606400597842.png" alt="1606400597842"></p>
+<p><img src="https://gitee.com/zvenw/pics/raw/master/img/1606400597842.png" alt="1606400597842"></p>
 </li>
 <li><p>检查安装是否成功,在Cygwin终端中输入此命令会打印出版本的运行状态</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cygcheck -c cygwin</span><br></pre></td></tr></table></figure>
@@ -1748,7 +1748,7 @@
 </ul>
 <ol>
 <li><p>添加一个邮箱，在证书即将到期或者自动更新失败的情况下，通过邮件形式通知。</p>
-<img src="D:\Desktop\学习笔记\nginx\nginx安装配置\nginx配置指南.assets\1606380299233.png" alt="1606380299233" style="zoom:67%;" /></li>
+<img src="https://gitee.com/zvenw/pics/raw/master/img/1606380299233.png" alt="1606380299233" style="zoom:67%;" /></li>
 <li><p>添加域名</p>
 <img src="https://gitee.com/zvenw/pics/raw/master/img/1606380411370.png" alt="1606380411370" style="zoom:67%;" /></li>
 <li><p>选择颁发机构，我们选择Let`s Encrypt</p>
@@ -1756,7 +1756,7 @@
 <li><p>选择验证类型</p>
 <img src="https://gitee.com/zvenw/pics/raw/master/img/1606380721058.png" alt="1606380721058" style="zoom:67%;" /></li>
 <li><p>配置DNS api秘钥</p>
-<img src="D:\Desktop\学习笔记\nginx\nginx安装配置\nginx配置指南.assets\1606380879811.png" alt="1606380879811" style="zoom:67%;" /></li>
+<img src="https://gitee.com/zvenw/pics/raw/master/img/1606380879811.png" alt="1606380879811" style="zoom:67%;" /></li>
 <li><p>授权设置</p>
 <img src="https://gitee.com/zvenw/pics/raw/master/img/1606381042928.png" alt="1606381042928" style="zoom:67%;" /></li>
 <li><p>证书部署</p>
@@ -1789,7 +1789,7 @@
 </ul>
 </li>
 <li><p>申请成功</p>
-<img src="D:\Desktop\学习笔记\nginx\nginx安装配置\nginx配置指南.assets\1606384499335.png" alt="1606384499335" style="zoom:67%;" />
+<img src="https://gitee.com/zvenw/pics/raw/master/img/1606384499335.png" alt="1606384499335" style="zoom:67%;" />
 
  <img src="https://gitee.com/zvenw/pics/raw/master/img/1606384587769.png" alt="1606384587769" style="zoom:67%;" />
 
