@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-02-18T03:49:47.446Z</updated>
+  <updated>2022-02-18T06:56:13.714Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Ansible学习笔记</title>
+    <link href="https://ziveni.github.io/2022/02/18/Ansible%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <id>https://ziveni.github.io/2022/02/18/Ansible%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</id>
+    <published>2022-02-18T06:55:09.000Z</published>
+    <updated>2022-02-18T06:56:13.714Z</updated>
+    
+    
+    
+    
+    <category term="Ansible" scheme="https://ziveni.github.io/categories/Ansible/"/>
+    
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
+    <category term="Ansible" scheme="https://ziveni.github.io/tags/Ansible/"/>
+    
+  </entry>
   
   <entry>
     <title>Docker学习笔记</title>
@@ -42,6 +61,8 @@
     <category term="docker" scheme="https://ziveni.github.io/categories/docker/"/>
     
     
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
     <category term="docker" scheme="https://ziveni.github.io/tags/docker/"/>
     
     <category term="Harbor" scheme="https://ziveni.github.io/tags/Harbor/"/>
@@ -49,8 +70,6 @@
     <category term="register" scheme="https://ziveni.github.io/tags/register/"/>
     
     <category term="rancher" scheme="https://ziveni.github.io/tags/rancher/"/>
-    
-    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
     
   </entry>
   
