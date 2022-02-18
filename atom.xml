@@ -42,8 +42,6 @@
     <category term="docker" scheme="https://ziveni.github.io/categories/docker/"/>
     
     
-    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
-    
     <category term="docker" scheme="https://ziveni.github.io/tags/docker/"/>
     
     <category term="Harbor" scheme="https://ziveni.github.io/tags/Harbor/"/>
@@ -51,6 +49,8 @@
     <category term="register" scheme="https://ziveni.github.io/tags/register/"/>
     
     <category term="rancher" scheme="https://ziveni.github.io/tags/rancher/"/>
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
     
   </entry>
   
@@ -246,9 +246,9 @@
     <category term="oracle" scheme="https://ziveni.github.io/categories/oracle/"/>
     
     
-    <category term="oracle" scheme="https://ziveni.github.io/tags/oracle/"/>
-    
     <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
+    <category term="oracle" scheme="https://ziveni.github.io/tags/oracle/"/>
     
     <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
     
