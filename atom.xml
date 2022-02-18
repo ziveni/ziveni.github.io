@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-02-18T06:56:13.714Z</updated>
+  <updated>2022-02-18T08:55:43.930Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>Ansible学习笔记</title>
-    <link href="https://ziveni.github.io/2022/02/18/Ansible%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <id>https://ziveni.github.io/2022/02/18/Ansible%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</id>
+    <link href="https://ziveni.github.io/posts/45ad51da/"/>
+    <id>https://ziveni.github.io/posts/45ad51da/</id>
     <published>2022-02-18T06:55:09.000Z</published>
-    <updated>2022-02-18T06:56:13.714Z</updated>
+    <updated>2022-02-18T08:55:43.930Z</updated>
     
     
     
@@ -37,10 +37,10 @@
   
   <entry>
     <title>Docker学习笔记</title>
-    <link href="https://ziveni.github.io/2022/02/18/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <id>https://ziveni.github.io/2022/02/18/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</id>
+    <link href="https://ziveni.github.io/posts/4a3d459a/"/>
+    <id>https://ziveni.github.io/posts/4a3d459a/</id>
     <published>2022-02-18T01:30:38.000Z</published>
-    <updated>2022-02-18T03:49:47.446Z</updated>
+    <updated>2022-02-18T08:55:43.956Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&quot;&gt;&lt;a href=&quot;#摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&quot; class=&quot;headerlink&quot; title=&quot;摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&quot;&gt;&lt;/a&gt;摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -75,10 +75,10 @@
   
   <entry>
     <title>mariadb主从复制</title>
-    <link href="https://ziveni.github.io/2022/02/18/mariadb%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/"/>
-    <id>https://ziveni.github.io/2022/02/18/mariadb%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</id>
+    <link href="https://ziveni.github.io/posts/9451060a/"/>
+    <id>https://ziveni.github.io/posts/9451060a/</id>
     <published>2022-02-18T01:29:17.000Z</published>
-    <updated>2022-02-18T03:40:02.633Z</updated>
+    <updated>2022-02-18T08:55:43.965Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -107,10 +107,10 @@
   
   <entry>
     <title>mariadb安装指南</title>
-    <link href="https://ziveni.github.io/2022/02/18/mariadb%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/"/>
-    <id>https://ziveni.github.io/2022/02/18/mariadb%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</id>
+    <link href="https://ziveni.github.io/posts/475a898c/"/>
+    <id>https://ziveni.github.io/posts/475a898c/</id>
     <published>2022-02-18T01:29:05.000Z</published>
-    <updated>2022-02-18T03:38:13.454Z</updated>
+    <updated>2022-02-18T08:55:43.968Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -139,10 +139,10 @@
   
   <entry>
     <title>nginx+keepalived高可用</title>
-    <link href="https://ziveni.github.io/2022/02/18/nginx-keepalived%E9%AB%98%E5%8F%AF%E7%94%A8/"/>
-    <id>https://ziveni.github.io/2022/02/18/nginx-keepalived%E9%AB%98%E5%8F%AF%E7%94%A8/</id>
+    <link href="https://ziveni.github.io/posts/bc02660d/"/>
+    <id>https://ziveni.github.io/posts/bc02660d/</id>
     <published>2022-02-18T01:28:37.000Z</published>
-    <updated>2022-02-18T03:35:47.050Z</updated>
+    <updated>2022-02-18T08:55:43.985Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：nginx-keepalived-实现高可用（主备，双主模式）&quot;&gt;&lt;a href=&quot;#摘要：nginx-keepalived-实现高可用（主备，双主模式）&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx +keepalived 实现高可用（主备，双主模式）&quot;&gt;&lt;/a&gt;摘要：nginx +keepalived 实现高可用（主备，双主模式）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -173,10 +173,10 @@
   
   <entry>
     <title>nginx安装指南</title>
-    <link href="https://ziveni.github.io/2022/02/18/nginx%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/"/>
-    <id>https://ziveni.github.io/2022/02/18/nginx%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</id>
+    <link href="https://ziveni.github.io/posts/31ae148b/"/>
+    <id>https://ziveni.github.io/posts/31ae148b/</id>
     <published>2022-02-18T01:28:09.000Z</published>
-    <updated>2022-02-18T08:43:09.406Z</updated>
+    <updated>2022-02-18T08:55:43.970Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：nginx-在linux（centos），windows下的安装步骤&quot;&gt;&lt;a href=&quot;#摘要：nginx-在linux（centos），windows下的安装步骤&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx 在linux（centos），windows下的安装步骤&quot;&gt;&lt;/a&gt;摘要：nginx 在linux（centos），windows下的安装步骤&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -207,10 +207,10 @@
   
   <entry>
     <title>nginx配置指南</title>
-    <link href="https://ziveni.github.io/2022/02/18/nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/"/>
-    <id>https://ziveni.github.io/2022/02/18/nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/</id>
+    <link href="https://ziveni.github.io/posts/e3c0704d/"/>
+    <id>https://ziveni.github.io/posts/e3c0704d/</id>
     <published>2022-02-18T01:27:58.000Z</published>
-    <updated>2022-02-18T08:47:11.956Z</updated>
+    <updated>2022-02-18T08:55:43.973Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：nginx-常规配置及场景（反向代理，正向代理）；SSL证书申请（acme-sh-certbot-snap-）&quot;&gt;&lt;a href=&quot;#摘要：nginx-常规配置及场景（反向代理，正向代理）；SSL证书申请（acme-sh-certbot-snap-）&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx 常规配置及场景（反向代理，正向代理）；SSL证书申请（acme.sh,certbot-snap ）&quot;&gt;&lt;/a&gt;摘要：nginx 常规配置及场景（反向代理，正向代理）；SSL证书申请（acme.sh,certbot-snap ）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -241,10 +241,10 @@
   
   <entry>
     <title>Oracle11g数据库安装指南(centos)</title>
-    <link href="https://ziveni.github.io/2022/02/18/Oracle11g%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97-centos/"/>
-    <id>https://ziveni.github.io/2022/02/18/Oracle11g%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97-centos/</id>
+    <link href="https://ziveni.github.io/posts/4569b114/"/>
+    <id>https://ziveni.github.io/posts/4569b114/</id>
     <published>2022-02-18T01:27:12.000Z</published>
-    <updated>2022-02-18T03:07:31.625Z</updated>
+    <updated>2022-02-18T08:55:43.960Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;a href=&quot;#摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot; class=&quot;headerlink&quot; title=&quot;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;/a&gt;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -275,10 +275,10 @@
   
   <entry>
     <title>redis安装部署指南</title>
-    <link href="https://ziveni.github.io/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/"/>
-    <id>https://ziveni.github.io/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/</id>
+    <link href="https://ziveni.github.io/posts/f6030cf0/"/>
+    <id>https://ziveni.github.io/posts/f6030cf0/</id>
     <published>2022-02-17T09:37:26.000Z</published>
-    <updated>2022-02-18T03:20:58.781Z</updated>
+    <updated>2022-02-18T08:55:43.977Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;a href=&quot;#摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot; class=&quot;headerlink&quot; title=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;/a&gt;摘要：redis在linux下的安装部署，哨兵模式，集群模式&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;

@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Ansible学习笔记</title>
-    <url>/2022/02/18/Ansible%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <url>/posts/45ad51da/</url>
     <content><![CDATA[]]></content>
       <categories>
         <category>Ansible</category>
@@ -14,7 +14,7 @@
   </entry>
   <entry>
     <title>Docker学习笔记</title>
-    <url>/2022/02/18/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <url>/posts/4a3d459a/</url>
     <content><![CDATA[<h3 id="摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建"><a href="#摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建" class="headerlink" title="摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建"></a>摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -368,7 +368,7 @@
   </entry>
   <entry>
     <title>Oracle11g数据库安装指南(centos)</title>
-    <url>/2022/02/18/Oracle11g%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97-centos/</url>
+    <url>/posts/4569b114/</url>
     <content><![CDATA[<h3 id="摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）"><a href="#摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）" class="headerlink" title="摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）"></a>摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -847,7 +847,7 @@
   </entry>
   <entry>
     <title>mariadb主从复制</title>
-    <url>/2022/02/18/mariadb%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</url>
+    <url>/posts/9451060a/</url>
     <content><![CDATA[<h3 id="摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）"><a href="#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）" class="headerlink" title="摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）"></a>摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -955,7 +955,7 @@
   </entry>
   <entry>
     <title>mariadb安装指南</title>
-    <url>/2022/02/18/mariadb%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</url>
+    <url>/posts/475a898c/</url>
     <content><![CDATA[<h3 id="摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）"><a href="#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）" class="headerlink" title="摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）"></a>摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -1024,7 +1024,7 @@
   </entry>
   <entry>
     <title>nginx+keepalived高可用</title>
-    <url>/2022/02/18/nginx-keepalived%E9%AB%98%E5%8F%AF%E7%94%A8/</url>
+    <url>/posts/bc02660d/</url>
     <content><![CDATA[<h3 id="摘要：nginx-keepalived-实现高可用（主备，双主模式）"><a href="#摘要：nginx-keepalived-实现高可用（主备，双主模式）" class="headerlink" title="摘要：nginx +keepalived 实现高可用（主备，双主模式）"></a>摘要：nginx +keepalived 实现高可用（主备，双主模式）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -1150,7 +1150,7 @@
   </entry>
   <entry>
     <title>nginx安装指南</title>
-    <url>/2022/02/18/nginx%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</url>
+    <url>/posts/31ae148b/</url>
     <content><![CDATA[<h3 id="摘要：nginx-在linux（centos），windows下的安装步骤"><a href="#摘要：nginx-在linux（centos），windows下的安装步骤" class="headerlink" title="摘要：nginx 在linux（centos），windows下的安装步骤"></a>摘要：nginx 在linux（centos），windows下的安装步骤</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -1417,7 +1417,7 @@
   </entry>
   <entry>
     <title>nginx配置指南</title>
-    <url>/2022/02/18/nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/</url>
+    <url>/posts/e3c0704d/</url>
     <content><![CDATA[<h3 id="摘要：nginx-常规配置及场景（反向代理，正向代理）；SSL证书申请（acme-sh-certbot-snap-）"><a href="#摘要：nginx-常规配置及场景（反向代理，正向代理）；SSL证书申请（acme-sh-certbot-snap-）" class="headerlink" title="摘要：nginx 常规配置及场景（反向代理，正向代理）；SSL证书申请（acme.sh,certbot-snap ）"></a>摘要：nginx 常规配置及场景（反向代理，正向代理）；SSL证书申请（acme.sh,certbot-snap ）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
@@ -1850,7 +1850,7 @@
   </entry>
   <entry>
     <title>redis安装部署指南</title>
-    <url>/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/</url>
+    <url>/posts/f6030cf0/</url>
     <content><![CDATA[<h3 id="摘要：redis在linux下的安装部署，哨兵模式，集群模式"><a href="#摘要：redis在linux下的安装部署，哨兵模式，集群模式" class="headerlink" title="摘要：redis在linux下的安装部署，哨兵模式，集群模式"></a>摘要：redis在linux下的安装部署，哨兵模式，集群模式</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
