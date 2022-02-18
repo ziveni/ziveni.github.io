@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>ZIVENI</title>
   <icon>https://ziveni.github.io/icon.png</icon>
-  <subtitle>then make it simple</subtitle>
+  <subtitle>Then make it simple</subtitle>
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-02-17T09:51:02.102Z</updated>
+  <updated>2022-02-18T03:49:47.446Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -17,21 +17,270 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Docker学习笔记</title>
+    <link href="https://ziveni.github.io/2022/02/18/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <id>https://ziveni.github.io/2022/02/18/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</id>
+    <published>2022-02-18T01:30:38.000Z</published>
+    <updated>2022-02-18T03:49:47.446Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&quot;&gt;&lt;a href=&quot;#摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&quot; class=&quot;headerlink&quot; title=&quot;摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&quot;&gt;&lt;/a&gt;摘要：Docker在linux下的安装和基本使用，docker-compos的安装和使用，自我搭建docker仓库（官方register，企业级Harbor），容器编排rancher搭建&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="docker" scheme="https://ziveni.github.io/categories/docker/"/>
+    
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
+    <category term="docker" scheme="https://ziveni.github.io/tags/docker/"/>
+    
+    <category term="Harbor" scheme="https://ziveni.github.io/tags/Harbor/"/>
+    
+    <category term="register" scheme="https://ziveni.github.io/tags/register/"/>
+    
+    <category term="rancher" scheme="https://ziveni.github.io/tags/rancher/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>mariadb主从复制</title>
+    <link href="https://ziveni.github.io/2022/02/18/mariadb%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/"/>
+    <id>https://ziveni.github.io/2022/02/18/mariadb%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</id>
+    <published>2022-02-18T01:29:17.000Z</published>
+    <updated>2022-02-18T03:40:02.633Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/categories/mariadb/"/>
+    
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/tags/mariadb/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>mariadb安装指南</title>
+    <link href="https://ziveni.github.io/2022/02/18/mariadb%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/"/>
+    <id>https://ziveni.github.io/2022/02/18/mariadb%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</id>
+    <published>2022-02-18T01:29:05.000Z</published>
+    <updated>2022-02-18T03:38:13.454Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/categories/mariadb/"/>
+    
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/tags/mariadb/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>nginx+keepalived高可用</title>
+    <link href="https://ziveni.github.io/2022/02/18/nginx-keepalived%E9%AB%98%E5%8F%AF%E7%94%A8/"/>
+    <id>https://ziveni.github.io/2022/02/18/nginx-keepalived%E9%AB%98%E5%8F%AF%E7%94%A8/</id>
+    <published>2022-02-18T01:28:37.000Z</published>
+    <updated>2022-02-18T03:35:47.050Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：nginx-keepalived-实现高可用（主备，双主模式）&quot;&gt;&lt;a href=&quot;#摘要：nginx-keepalived-实现高可用（主备，双主模式）&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx +keepalived 实现高可用（主备，双主模式）&quot;&gt;&lt;/a&gt;摘要：nginx +keepalived 实现高可用（主备，双主模式）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="keepalived" scheme="https://ziveni.github.io/categories/keepalived/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="nginx" scheme="https://ziveni.github.io/tags/nginx/"/>
+    
+    <category term="keepalived" scheme="https://ziveni.github.io/tags/keepalived/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>nginx安装指南</title>
+    <link href="https://ziveni.github.io/2022/02/18/nginx%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/"/>
+    <id>https://ziveni.github.io/2022/02/18/nginx%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</id>
+    <published>2022-02-18T01:28:09.000Z</published>
+    <updated>2022-02-18T03:21:07.373Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：nginx-在linux（centos），windows下的安装步骤&quot;&gt;&lt;a href=&quot;#摘要：nginx-在linux（centos），windows下的安装步骤&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx 在linux（centos），windows下的安装步骤&quot;&gt;&lt;/a&gt;摘要：nginx 在linux（centos），windows下的安装步骤&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="nginx" scheme="https://ziveni.github.io/categories/nginx/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="nginx" scheme="https://ziveni.github.io/tags/nginx/"/>
+    
+    <category term="windows" scheme="https://ziveni.github.io/tags/windows/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>nginx配置指南</title>
+    <link href="https://ziveni.github.io/2022/02/18/nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/"/>
+    <id>https://ziveni.github.io/2022/02/18/nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/</id>
+    <published>2022-02-18T01:27:58.000Z</published>
+    <updated>2022-02-18T03:30:15.774Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：nginx-常规配置及场景（反向代理，正向代理）；SSL证书申请（acme-sh-certbot-snap-）&quot;&gt;&lt;a href=&quot;#摘要：nginx-常规配置及场景（反向代理，正向代理）；SSL证书申请（acme-sh-certbot-snap-）&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx 常规配置及场景（反向代理，正向代理）；SSL证书申请（acme.sh,certbot-snap ）&quot;&gt;&lt;/a&gt;摘要：nginx 常规配置及场景（反向代理，正向代理）；SSL证书申请（acme.sh,certbot-snap ）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="nginx" scheme="https://ziveni.github.io/categories/nginx/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="nginx" scheme="https://ziveni.github.io/tags/nginx/"/>
+    
+    <category term="windows" scheme="https://ziveni.github.io/tags/windows/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Oracle11g数据库安装指南(centos)</title>
+    <link href="https://ziveni.github.io/2022/02/18/Oracle11g%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97-centos/"/>
+    <id>https://ziveni.github.io/2022/02/18/Oracle11g%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97-centos/</id>
+    <published>2022-02-18T01:27:12.000Z</published>
+    <updated>2022-02-18T03:07:31.625Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;a href=&quot;#摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot; class=&quot;headerlink&quot; title=&quot;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;/a&gt;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="oracle" scheme="https://ziveni.github.io/categories/oracle/"/>
+    
+    
+    <category term="oracle" scheme="https://ziveni.github.io/tags/oracle/"/>
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+  </entry>
+  
+  <entry>
     <title>redis安装部署指南</title>
     <link href="https://ziveni.github.io/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/"/>
     <id>https://ziveni.github.io/2022/02/17/redis%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/</id>
     <published>2022-02-17T09:37:26.000Z</published>
-    <updated>2022-02-17T09:51:02.102Z</updated>
+    <updated>2022-02-18T03:20:58.781Z</updated>
     
     
-    <summary type="html">&lt;h3 id=&quot;redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;a href=&quot;#redis在linux下的安装部署，哨兵模式，集群模式&quot; class=&quot;headerlink&quot; title=&quot;redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;/a&gt;redis在linux下的安装部署，哨兵模式，集群模式&lt;/h3&gt;</summary>
+    <summary type="html">&lt;h3 id=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;a href=&quot;#摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot; class=&quot;headerlink&quot; title=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;/a&gt;摘要：redis在linux下的安装部署，哨兵模式，集群模式&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
     
     
     
     <category term="redis" scheme="https://ziveni.github.io/categories/redis/"/>
     
     
-    <category term="Linux" scheme="https://ziveni.github.io/tags/Linux/"/>
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
     
     <category term="redis" scheme="https://ziveni.github.io/tags/redis/"/>
     
