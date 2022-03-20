@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>ZIVENI</title>
   <icon>https://ziveni.github.io/icon.png</icon>
-  <subtitle>Then make it simple</subtitle>
+  <subtitle>不用太着急去否定一些事情，你可能只是今天心情不好</subtitle>
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
