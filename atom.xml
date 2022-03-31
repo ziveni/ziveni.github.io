@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-02-18T08:55:43.930Z</updated>
+  <updated>2022-03-31T03:40:35.361Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -15,6 +15,39 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>mariadb修改数据目录后无法启动</title>
+    <link href="https://ziveni.github.io/posts/35bbfaaa/"/>
+    <id>https://ziveni.github.io/posts/35bbfaaa/</id>
+    <published>2022-03-31T03:27:49.000Z</published>
+    <updated>2022-03-31T03:40:35.361Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在centos7-9中因修改数据目录到-home目录中，导致无法启动的问题&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在centos7-9中因修改数据目录到-home目录中，导致无法启动的问题&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在centos7.9中因修改数据目录到/home目录中，导致无法启动的问题&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在centos7.9中因修改数据目录到/home目录中，导致无法启动的问题&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-03-31&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;h1 id=&quot;Can’t-create-test-file-home-mysql-data-localhost-lower-test&quot;&gt;&lt;a href=&quot;#Can’t-create-test-file-home-mysql-data-localhost-lower-test&quot; class=&quot;headerlink&quot; title=&quot;Can’t create test file /home/mysql_data/localhost.lower-test&quot;&gt;&lt;/a&gt;Can’t create test file /home/mysql_data/localhost.lower-test&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;问题描述: 因为服务器的数据盘分区全部分在的/home上，所以必须进行数据库数据目录的修改，我安装的是mariadb10.5，操作系统是centos7.9, 当我&lt;code&gt;修改server.cnf&lt;/code&gt;里&lt;code&gt;datadir=/home/mysql_data/&lt;/code&gt;之后，无论怎么修改数据目录权限，都无法正常启动，status或&lt;code&gt;journalctl -xe&lt;/code&gt;都提示我Can’t create test file /home/mysql_data/localhost.lower-test，百度了半天都说是selinux或者appammor（也不知道是啥，centos里压根就没有）。崩溃……&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/categories/mariadb/"/>
+    
+    
+    <category term="centos  mariadb" scheme="https://ziveni.github.io/tags/centos-mariadb/"/>
+    
+  </entry>
   
   <entry>
     <title>Ansible学习笔记</title>
