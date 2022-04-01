@@ -2199,4 +2199,16 @@
         <tag>redis</tag>
       </tags>
   </entry>
+  <entry>
+    <title>zabbix操作指南</title>
+    <url>/posts/a39de4c0/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>zabbix</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>zabbix</tag>
+      </tags>
+  </entry>
 </search>
