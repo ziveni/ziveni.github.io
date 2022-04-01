@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-03-31T03:49:57.243Z</updated>
+  <updated>2022-04-01T03:30:41.492Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://ziveni.github.io/posts/35bbfaaa/"/>
     <id>https://ziveni.github.io/posts/35bbfaaa/</id>
     <published>2022-03-31T03:27:49.000Z</published>
-    <updated>2022-03-31T03:49:57.243Z</updated>
+    <updated>2022-04-01T03:30:41.492Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在centos7-9中因修改数据目录到-home目录中，导致无法启动的问题&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在centos7-9中因修改数据目录到-home目录中，导致无法启动的问题&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在centos7.9中因修改数据目录到/home目录中，导致无法启动的问题&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在centos7.9中因修改数据目录到/home目录中，导致无法启动的问题&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -45,7 +45,9 @@
     <category term="mariadb" scheme="https://ziveni.github.io/categories/mariadb/"/>
     
     
-    <category term="centos  mariadb" scheme="https://ziveni.github.io/tags/centos-mariadb/"/>
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/tags/mariadb/"/>
     
   </entry>
   
@@ -277,7 +279,7 @@
     <link href="https://ziveni.github.io/posts/4569b114/"/>
     <id>https://ziveni.github.io/posts/4569b114/</id>
     <published>2022-02-18T01:27:12.000Z</published>
-    <updated>2022-02-18T08:55:43.960Z</updated>
+    <updated>2022-03-31T03:56:07.281Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;a href=&quot;#摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot; class=&quot;headerlink&quot; title=&quot;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;/a&gt;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;

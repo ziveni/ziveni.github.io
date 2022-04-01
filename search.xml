@@ -78,7 +78,7 @@
 <li><p>使用以下命令查看未挂载的硬盘</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/zvenw/pics/raw/master/img/1598755081242.png"></p>
+<p><img src="https://up.ziveni.top/img/1598755081242.png-ziveni"></p>
 </li>
 <li><p>使用以下命令进行磁盘分区,此处只分了一个区</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">fdisk /dev/sdb</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">确认命令：m——&gt; n ——&gt;p ——&gt;回车 ——&gt;回车 ——&gt;回车 ——&gt;w</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">n:添加一个分区</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">P:主分区</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">回车:只有一个分区</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">回车：开始扇区大小</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">回车：结束扇区大小</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">w:写入磁盘</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">项目中该硬盘主要用于软件安装和存储数据用，所以全部用来做主分区。</span></span><br></pre></td></tr></table></figure>
@@ -1042,14 +1042,14 @@
 </ul>
 <span id="more"></span>
 
-<p><img src="https://up.ziveni.top/img/image-20220331113054331.png-ziveni" alt="image-20220331113054331"></p>
+<p><img src="https://s2.loli.net/2022/04/01/ylgfChvVz4e6tYB.png" alt="image-20220331113054331"></p>
 <ul>
 <li><p>解决办法</p>
 <ul>
 <li><p>最终还是决定去大世界看看，Google一下，果然百度的一堆都是坑，原因在于mariadb.service中<code> Prevent accessing /home, /root and /run/user</code>，看到这里恍然大明白… 于是</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 编辑mariadb.service</span></span><br><span class="line">vim /usr/lib/systemd/system/mariadb.service</span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 将改选项修改为<span class="literal">false</span></span></span><br><span class="line">ProtectHome=false</span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. reload systemctl</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 启动</span></span><br><span class="line">systemctl start mariadb</span><br></pre></td></tr></table></figure></li>
 </ul>
-<p><img src="https://up.ziveni.top/img/image-20220331113853198.png-ziveni" alt="image-20220331113853198"></p>
+<p><img src="https://s2.loli.net/2022/04/01/jUtbg8rlY5p2Iav.png" alt="image-20220331113853198"></p>
 </li>
 <li><p>完美</p>
 </li>
@@ -1061,7 +1061,8 @@
         <category>mariadb</category>
       </categories>
       <tags>
-        <tag>centos  mariadb</tag>
+        <tag>centos</tag>
+        <tag>mariadb</tag>
       </tags>
   </entry>
   <entry>
