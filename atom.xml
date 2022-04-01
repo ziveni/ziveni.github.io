@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-04-01T09:32:52.200Z</updated>
+  <updated>2022-04-01T09:33:19.846Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://ziveni.github.io/posts/a39de4c0/"/>
     <id>https://ziveni.github.io/posts/a39de4c0/</id>
     <published>2022-04-01T09:32:29.000Z</published>
-    <updated>2022-04-01T09:32:52.200Z</updated>
+    <updated>2022-04-01T09:33:19.846Z</updated>
     
     
     
@@ -164,7 +164,7 @@
     <link href="https://ziveni.github.io/posts/475a898c/"/>
     <id>https://ziveni.github.io/posts/475a898c/</id>
     <published>2022-02-18T01:29:05.000Z</published>
-    <updated>2022-04-01T09:00:46.379Z</updated>
+    <updated>2022-04-01T09:47:43.297Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;a href=&quot;#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot; class=&quot;headerlink&quot; title=&quot;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&quot;&gt;&lt;/a&gt;摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -230,7 +230,7 @@
     <link href="https://ziveni.github.io/posts/31ae148b/"/>
     <id>https://ziveni.github.io/posts/31ae148b/</id>
     <published>2022-02-18T01:28:09.000Z</published>
-    <updated>2022-04-01T09:05:40.395Z</updated>
+    <updated>2022-04-01T09:48:07.829Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：nginx-在linux（centos），windows下的安装步骤&quot;&gt;&lt;a href=&quot;#摘要：nginx-在linux（centos），windows下的安装步骤&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx 在linux（centos），windows下的安装步骤&quot;&gt;&lt;/a&gt;摘要：nginx 在linux（centos），windows下的安装步骤&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -298,7 +298,7 @@
     <link href="https://ziveni.github.io/posts/4569b114/"/>
     <id>https://ziveni.github.io/posts/4569b114/</id>
     <published>2022-02-18T01:27:12.000Z</published>
-    <updated>2022-04-01T09:19:43.026Z</updated>
+    <updated>2022-04-01T09:45:29.890Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;a href=&quot;#摘要：oracle11g-在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot; class=&quot;headerlink&quot; title=&quot;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&quot;&gt;&lt;/a&gt;摘要：oracle11g 在centos下的安装方法，三种方式（图形化，静默安装，远程图形化安装）&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
