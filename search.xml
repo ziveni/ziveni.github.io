@@ -2211,4 +2211,37 @@
         <tag>zabbix</tag>
       </tags>
   </entry>
+  <entry>
+    <title>sudo配置规则.md</title>
+    <url>/posts/ecad03f9/</url>
+    <content><![CDATA[<h3 id="摘要：sudo的规则配置"><a href="#摘要：sudo的规则配置" class="headerlink" title="摘要：sudo的规则配置"></a>摘要：sudo的规则配置</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">用户sudo授权：</span><br><span class="line">visudo</span><br><span class="line"><span class="comment">## Allow root to run any commands anywhere</span></span><br><span class="line">root    ALL=(ALL)       ALL</span><br><span class="line">user    ALL=(root)      NOPASSWD:ALL,!/sbin/shutdown,!/sbin/init,!/bin/<span class="built_in">rm</span> <span class="literal">-rf</span> /</span><br><span class="line"></span><br><span class="line">解释说明：</span><br><span class="line"><span class="number">1</span>）第一个字段user指定的是用户：可以是用户名，也可以是别名。每个用户设置一行，多个用户设置多行，也可以将多个用户设置成一个别名后再进行设置。</span><br><span class="line"><span class="number">2</span>）第二个字段ALL指定的是用户所在的主机：可以是ip,也可以是主机名，表示该sudo设置只在该主机上生效，ALL表示在所有主机上都生效！限制的一般都是本机，也就是限制使用这个文件的主机;一般都指定为<span class="string">&quot;ALL&quot;</span>表示所有的主机，不管文件拷到那里都可以用。比如：<span class="number">10.1</span>.<span class="number">1.1</span>=...则表示只在当前主机生效。</span><br><span class="line"><span class="number">3</span>）第三个字段（root）括号里指定的也是用户：指定以什么用户身份执行sudo，即使用sudo后可以享有所有root账号下的权限。如果要排除个别用户，可以在括号内设置，比如ALL=(ALL,!oracle,!pos)。</span><br><span class="line"><span class="number">4</span>）第四个字段ALL指定的是执行的命令：即使用sudo后可以执行所有的命令。除了关机和删除根内容以外；也可以设置别名。NOPASSWD: ALL表示使用sudo的不需要输入密码。</span><br><span class="line"><span class="number">5</span>）也可以授权给一个用户组</span><br><span class="line">	%admin ALL=(ALL) ALL	表示admin组里的所有成员可以在任何主机上以任何用户身份执行任何命令</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参考连接</li>
+<li><a href="https://juejin.cn/post/6992609027234463758">Linux sudo和sudoers详解！</a></li>
+<li><a href="https://www.sogou.com/link?url=hedJjaC291OSi_i_Ca0srR5OmlBS3kcCytWslkz0jklZeKmuPWg0fw..">sudo配置文件详解</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>shell</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>shell</tag>
+      </tags>
+  </entry>
 </search>

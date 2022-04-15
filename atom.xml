@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-04-01T09:33:19.846Z</updated>
+  <updated>2022-04-15T01:43:21.443Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -15,6 +15,38 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>sudo配置规则.md</title>
+    <link href="https://ziveni.github.io/posts/ecad03f9/"/>
+    <id>https://ziveni.github.io/posts/ecad03f9/</id>
+    <published>2022-04-15T01:34:29.000Z</published>
+    <updated>2022-04-15T01:43:21.443Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：sudo的规则配置&quot;&gt;&lt;a href=&quot;#摘要：sudo的规则配置&quot; class=&quot;headerlink&quot; title=&quot;摘要：sudo的规则配置&quot;&gt;&lt;/a&gt;摘要：sudo的规则配置&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="shell" scheme="https://ziveni.github.io/categories/shell/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="shell" scheme="https://ziveni.github.io/tags/shell/"/>
+    
+  </entry>
   
   <entry>
     <title>zabbix操作指南</title>
