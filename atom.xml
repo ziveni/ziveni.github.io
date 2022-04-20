@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-04-20T03:30:52.700Z</updated>
+  <updated>2022-04-20T03:54:10.285Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -15,6 +15,66 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Prometheus之mysqld_exporter</title>
+    <link href="https://ziveni.github.io/posts/60592cec/"/>
+    <id>https://ziveni.github.io/posts/60592cec/</id>
+    <published>2022-04-20T03:54:10.000Z</published>
+    <updated>2022-04-20T03:54:10.285Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Prometheus之pushgateway</title>
+    <link href="https://ziveni.github.io/posts/9ec87397/"/>
+    <id>https://ziveni.github.io/posts/9ec87397/</id>
+    <published>2022-04-20T03:53:47.000Z</published>
+    <updated>2022-04-20T03:53:47.765Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Prometheus之Altermanager</title>
+    <link href="https://ziveni.github.io/posts/be093ac/"/>
+    <id>https://ziveni.github.io/posts/be093ac/</id>
+    <published>2022-04-20T03:53:18.000Z</published>
+    <updated>2022-04-20T03:57:43.642Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;摘要：Prometheus之Altermanager安装配置&lt;/p&gt;
+&lt;p&gt;更新内容&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="Prometheus" scheme="https://ziveni.github.io/categories/Prometheus/"/>
+    
+    
+    <category term="Prometheus" scheme="https://ziveni.github.io/tags/Prometheus/"/>
+    
+    <category term="Altermanager" scheme="https://ziveni.github.io/tags/Altermanager/"/>
+    
+  </entry>
   
   <entry>
     <title>centos中使用odbc配置mysql或mariadb</title>
@@ -59,7 +119,7 @@
     <link href="https://ziveni.github.io/posts/2047dd97/"/>
     <id>https://ziveni.github.io/posts/2047dd97/</id>
     <published>2022-04-18T02:56:51.000Z</published>
-    <updated>2022-04-20T03:46:51.842Z</updated>
+    <updated>2022-04-20T05:34:22.360Z</updated>
     
     
     <summary type="html">&lt;p&gt;摘要：Prometheus+Grafana部署系统监控&lt;/p&gt;

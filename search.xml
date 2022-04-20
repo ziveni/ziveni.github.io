@@ -896,7 +896,7 @@
 <li>配置数据源Data sources-&gt;Add data source -&gt; Prometheus，输入prometheus数据源的信息，主要是输入name和url</li>
 </ul>
 <p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204191750576.png" alt="image-20220419174959969"></p>
-<img src="D:/workspace/typora_pic/image-20220420110248029.png" alt="image-20220420110248029" style="zoom:50%;" />
+<img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204201334202.png" alt="image-20220420110248029" style="zoom:50%;" />
 
 <img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204201101813.png" alt="image-20220419175114474" style="zoom:50%;" />
 
@@ -2387,5 +2387,53 @@
         <tag>centos</tag>
         <tag>shell</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Prometheus之Altermanager</title>
+    <url>/posts/be093ac/</url>
+    <content><![CDATA[<p>摘要：Prometheus之Altermanager安装配置</p>
+<p>更新内容</p>
+<table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+
+
+
+
+
+
+<ul>
+<li>参考连接</li>
+<li><a href="https://www.modb.pro/db/45956">https://www.modb.pro/db/45956</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Prometheus</category>
+      </categories>
+      <tags>
+        <tag>Prometheus</tag>
+        <tag>Altermanager</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Prometheus之mysqld_exporter</title>
+    <url>/posts/60592cec/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>Prometheus之pushgateway</title>
+    <url>/posts/9ec87397/</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>
