@@ -834,6 +834,164 @@
       </tags>
   </entry>
   <entry>
+    <title>Prometheus+Grafana部署系统监控</title>
+    <url>/posts/2047dd97/</url>
+    <content><![CDATA[<h3 id="摘要：Prometheus-Grafana部署系统监控"><a href="#摘要：Prometheus-Grafana部署系统监控" class="headerlink" title="摘要：Prometheus+Grafana部署系统监控"></a>摘要：Prometheus+Grafana部署系统监控</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<h1 id="prometheus-简单介绍"><a href="#prometheus-简单介绍" class="headerlink" title="prometheus 简单介绍"></a>prometheus 简单介绍</h1><ul>
+<li>官网: <a href="https://prometheus.io/">prometheus.io</a></li>
+</ul>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204191419769.png" alt="普罗米修斯架构"></p>
+<p><strong>Prometheus Server：</strong> 用于收集和存储时间序列化数据</p>
+<p><strong>Exporters：</strong>将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server，Prometheus Server通过访问该Exporter提供的Endpoint端点，即可以获取到需要采集的监控数据</p>
+<p><strong>Pushgateway：</strong>主要是实现接收由 Client push 过来的指标数据，在指定的时间间隔，由主程序来抓取。由于 Prometheus 数据采集基于 Pull 模型进行设计，因此在网络环境的配置上必须要让 Prometheus Server 能够直接与 Exporter 进行通信。当这种网络需求无法直接满足时，就可以利用 PushGateway 来进行中转。可以通过 PushGateway 将内部网络的监控数据主动 Push 到 Gateway 当中。而 Prometheus Server 则可以采用同样 Pull 的方式从 PushGateway 中获取到监控数据</p>
+<p><strong>Altermanager：</strong> 在Prometheus Server中支持基于Prom QL创建告警规则，如果满足Prom QL定义的规则，则会产生一条告警。当AlertManager从 Prometheus server 端接收到 alerts后，会进行去重，分组，并路由到相应的接收方，发出报警。</p>
+<h2 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h2><ol>
+<li>Prometheus server 定期从配置好的 jobs 或者 exporters 中拉取 metrics，或者从Pushgateway 拉取metrics，或者从其他的 Prometheus server 中拉 metrics。</li>
+<li>Prometheus server 在本地存储收集到的 metrics，并运行已定义好的 alert.rules，通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。记录新的时间序列或者向 Alertmanager 推送警报。</li>
+<li>Prometheus通过PromQL和其他API可视化地展示收集的数据。Prometheus支持很多方式的图表可视化，例如Grafana、自带的Promdash以及自身提供的模版引擎等等。Prometheus还提供HTTP API的查询方式，自定义所需要的输出。</li>
+</ol>
+<h1 id="prometheus-安装部署"><a href="#prometheus-安装部署" class="headerlink" title="prometheus 安装部署"></a>prometheus 安装部署</h1><h2 id="二进制包方式安装Prometheus"><a href="#二进制包方式安装Prometheus" class="headerlink" title="二进制包方式安装Prometheus"></a>二进制包方式安装Prometheus</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 创建prometheus用户</span></span><br><span class="line">useradd -M -s /sbin/nologin prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 下载prometheus</span></span><br><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.35.0-rc0/prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 解压</span></span><br><span class="line">tar -zxvf prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 使用systemctl管理进程</span></span><br><span class="line">vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line"><span class="meta">#</span><span class="language-bash">添加以下内容 执行路径根据实际情况填写</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus</span><br><span class="line">Documentation=https://prometheus.io/</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">Environment=&quot;GOMAXPROCS=4&quot;</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStart=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus \</span><br><span class="line">  --config.file=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus.yml \</span><br><span class="line">  --storage.tsdb.path=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64 \</span><br><span class="line">  --storage.tsdb.retention=30d \</span><br><span class="line">  --web.console.libraries=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/console_libraries \</span><br><span class="line">  --web.console.templates=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/consoles \</span><br><span class="line">  --web.listen-address=0.0.0.0:8905 \</span><br><span class="line">  --web.read-timeout=5m \</span><br><span class="line">  --web.max-connections=30 \</span><br><span class="line">  --query.max-concurrency=50 \</span><br><span class="line">  --web.enable-lifecycle #prometheus配置更改后可以进行热加载</span><br><span class="line">  --query.timeout=2m</span><br><span class="line">  </span><br><span class="line">PrivateTmp=true</span><br><span class="line">PrivateDevices=true</span><br><span class="line">ProtectHome=true</span><br><span class="line">NoNewPrivileges=true</span><br><span class="line">LimitNOFILE=infinity</span><br><span class="line">ReadWriteDirectories=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64</span><br><span class="line">ProtectSystem=full</span><br><span class="line"></span><br><span class="line">SyslogIdentifier=prometheus</span><br><span class="line">Restart=always</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 启动</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl start|reload||stop prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.可通过web访问</span></span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置密码"><a href="#配置密码" class="headerlink" title="配置密码"></a>配置密码</h2><ul>
+<li>默认情况下是可以直接访问prometheus的web UI的，这样是很不安全的，是可以配置TLS+密码验证的，这里只配置密码验证了。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash"> 1.安装httpd-tools</span></span><br><span class="line">yum install -y httpd-tools</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"> 2.生成密码</span></span><br><span class="line">htpasswd -nBC 10 &quot;&quot; | tr -d &#x27;:\n&#x27;   # 回车后输入密码  例如输入6个1</span><br><span class="line"><span class="meta">$</span><span class="language-bash">2y$10<span class="variable">$SpFQBSWkvNboPXm</span>/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.node_exporter安装目录下编辑web-config.yml文件</span></span><br><span class="line">basic_auth_users:</span><br><span class="line"><span class="meta">  # </span><span class="language-bash">用户名: 密码-上面加密生产的字符串</span> </span><br><span class="line">  mynode: $2y$10$SpFQBSWkvNboPXm/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span><br><span class="line"><span class="meta"># </span><span class="language-bash">启动node_exporter中加上以下配置 /usr/lib/systemd/system/prometheus.service</span></span><br><span class="line">--web.config.file=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/web-config.yml</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. reload</span></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl restart prometheus</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置prometheus-yml"><a href="#配置prometheus-yml" class="headerlink" title="配置prometheus.yml"></a>配置prometheus.yml</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">在prometheus安装目录中，配置prometheus.yml,增加basic_auth项</span></span><br><span class="line">basic_auth</span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &quot;prometheus&quot;</span><br><span class="line">    basic_auth</span><br><span class="line">basic_auth:</span><br><span class="line">      username: xxx</span><br><span class="line">      password: xxx</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&quot;localhost:8905&quot;]</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">reload prometheus</span></span><br><span class="line">systemctl reload prometheus</span><br></pre></td></tr></table></figure>
+
+<h1 id="node-exporter安装配置"><a href="#node-exporter安装配置" class="headerlink" title="node_exporter安装配置"></a>node_exporter安装配置</h1><h2 id="二进制包方式安装node-exporter"><a href="#二进制包方式安装node-exporter" class="headerlink" title="二进制包方式安装node_exporter"></a>二进制包方式安装node_exporter</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载，解压</span></span><br><span class="line">wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf  node_exporter-1.3.1.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 修改默认端口，在启动参数中加以下配置</span></span><br><span class="line">--web.listen-address=:8009</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 启动方式</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 前台启动</span></span></span><br><span class="line">node_exporter </span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 后台启动方式1</span></span></span><br><span class="line">node_exporter &amp;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 后台启动方式2</span></span></span><br><span class="line">nohup node_exporter &amp;&gt; /var/log/node_exporter.log &amp;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 带参数后台启动</span></span></span><br><span class="line">nohup node_exporter  --web.listen-address=0.0.0.0:8009  --web.telemetry-path=/metrics \ </span><br><span class="line">&amp;&gt; /var/log/node_exporter/node_exporter.log &amp;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4.使用systemctl管理 新建node_exporter.service</span></span><br><span class="line">vim  /usr/lib/systemd/system/node_exporter.service</span><br><span class="line"><span class="meta"># </span><span class="language-bash">添加以下内容 路径和端口根据实际情况配置</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Node_exporter</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecStart=/data/app/prometheus/node_exporter-1.3.1.linux-amd64/node_exporter \</span><br><span class="line">  --web.listen-address=0.0.0.0:8009 \</span><br><span class="line">  --web.telemetry-path=/metrics \</span><br><span class="line">  --log.level=info \</span><br><span class="line">  --log.format=logfmt</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -KILL $MAINPID</span><br><span class="line">Type=simple</span><br><span class="line">KillMode=control-group</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=15s</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5.启动</span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">重载配置文件</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line"><span class="meta">#</span><span class="language-bash">启动node_exporter</span></span><br><span class="line">systemctl start node_exporter</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.在web中可以直接看到Metrics数据</span></span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置密码-1"><a href="#配置密码-1" class="headerlink" title="配置密码"></a>配置密码</h2><ul>
+<li><p>由于node_exporter是prometheus server 通过pull方式拉取数据，这就导致端口是对外开放的，考虑安全性，需要加上密码验证</p>
+</li>
+<li><p><a href="https://github.com/prometheus/exporter-toolkit/blob/v0.1.0/https/README.md">参考</a></p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1.生成密码</span></span><br><span class="line">htpasswd -nBC 10 &quot;&quot; | tr -d &#x27;:\n&#x27;   # 回车后输入密码  例如输入6个1</span><br><span class="line"><span class="meta">$</span><span class="language-bash">2y$10<span class="variable">$SpFQBSWkvNboPXm</span>/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2.node_exporter安装目录下编辑web-config.yml文件</span></span><br><span class="line">basic_auth_users:</span><br><span class="line"><span class="meta">  # </span><span class="language-bash">用户名: 密码-上面加密生产的字符串</span> </span><br><span class="line">  mynode: $2y$10$SpFQBSWkvNboPXm/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span><br><span class="line"><span class="meta"># </span><span class="language-bash">启动node_exporter中加上以下配置 /usr/lib/systemd/system/node_exporter.service</span></span><br><span class="line">--web.config=/data/app/prometheus/node_exporter-1.3.1.linux-amd64/web-config.yml </span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. reload</span></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl restart node_exporter</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置prometheus-yml-1"><a href="#配置prometheus-yml-1" class="headerlink" title="配置prometheus.yml"></a>配置prometheus.yml</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在prometheus安装目录中，配置prometheus.yml中下面增加如下配置</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&#x27;nodes&#x27;</span></span><br><span class="line">    <span class="attr">basic_auth:</span> <span class="comment">#如果node_exporter中配置的用户密码增加此选项</span></span><br><span class="line">      <span class="attr">username:</span> <span class="string">xxx</span></span><br><span class="line">      <span class="attr">password:</span> <span class="string">xxx</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&#x27;127.0.0.1:8906&#x27;</span>,<span class="string">&#x27;127.0.0.1:8009&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># reload prometheus</span></span><br><span class="line"><span class="string">systemctl</span> <span class="string">reload</span> <span class="string">prometheus</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="安装Grafana，配置promrtheus数据源"><a href="#安装Grafana，配置promrtheus数据源" class="headerlink" title="安装Grafana，配置promrtheus数据源"></a>安装Grafana，配置promrtheus数据源</h1><ul>
+<li>官网：<a href="https://grafana.com/grafana/download">Grafana</a></li>
+<li>模板:   <a href="https://grafana.com/grafana/dashboards">dashboards</a></li>
+</ul>
+<h2 id="下载安装Grafana"><a href="#下载安装Grafana" class="headerlink" title="下载安装Grafana"></a>下载安装Grafana</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载安装grafana</span></span><br><span class="line">wget https://dl.grafana.com/enterprise/release/grafana-enterprise-8.4.6-1.x86_64.rpm</span><br><span class="line">sudo yum install grafana-enterprise-8.4.6-1.x86_64.rpm</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 启动grafana</span></span><br><span class="line">systemctl start grafana-server</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.grafana默认端口是3000，如果需要修改默认端口，进入grafana配置文件路径，修改配置文件</span></span><br><span class="line">vim /etc/grafana/grafana.ini</span><br><span class="line"><span class="meta"># </span><span class="language-bash">修改http_port端口</span></span><br><span class="line">http_port = 8907</span><br><span class="line"><span class="meta"># </span><span class="language-bash">reload或restart grafana-server</span></span><br><span class="line">systemctl restart grafana-server</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置prometheus源"><a href="#配置prometheus源" class="headerlink" title="配置prometheus源"></a>配置prometheus源</h2><ul>
+<li>配置数据源Data sources-&gt;Add data source -&gt; Prometheus，输入prometheus数据源的信息，主要是输入name和url</li>
+</ul>
+<p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204191750576.png" alt="image-20220419174959969"></p>
+<img src="D:/workspace/typora_pic/image-20220420110248029.png" alt="image-20220420110248029" style="zoom:50%;" />
+
+<img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204201101813.png" alt="image-20220419175114474" style="zoom:50%;" />
+
+<ul>
+<li>参考连接</li>
+<li><a href="https://zhuanlan.zhihu.com/p/434353542">https://zhuanlan.zhihu.com/p/434353542</a></li>
+<li><a href="https://blog.51cto.com/u_12082223/3241875">https://blog.51cto.com/u_12082223/3241875</a></li>
+<li><a href="http://www.yunweipai.com/34713.html">http://www.yunweipai.com/34713.html</a></li>
+<li><a href="https://www.modb.pro/db/45956">https://www.modb.pro/db/45956</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Prometheus</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>Prometheus</tag>
+        <tag>Grafana</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>centos中使用odbc配置mysql或mariadb</title>
+    <url>/posts/81ac0233/</url>
+    <content><![CDATA[<p>摘要：centos中使用odbc配置mysql或mariadb</p>
+<p>更新内容</p>
+<table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<h1 id="下载安装ODBC"><a href="#下载安装ODBC" class="headerlink" title="下载安装ODBC"></a>下载安装ODBC</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">yum install unixODBC unixODBC-devel -y</span><br></pre></td></tr></table></figure>
+
+<h1 id="下载安装connector-odbc-mysql或mariadb"><a href="#下载安装connector-odbc-mysql或mariadb" class="headerlink" title="下载安装connector-odbc(mysql或mariadb)"></a>下载安装connector-odbc(mysql或mariadb)</h1><ul>
+<li><a href="https://downloads.mysql.com/archives/c-odbc/">mysql官网</a></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1.下载安装mysql包</span></span><br><span class="line">wget https://downloads.mysql.com/archives/get/p/10/file/mysql-connector-odbc-5.3.13-1.el7.x86_64.rpm</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. rpm安装</span></span><br><span class="line">rpm -ivh mysql-connector-odbc-5.3.13-1.el7.x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="https://mariadb.com/downloads/connectors/connectors-data-access/odbc-connector">mariadb官网</a></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载mariadb包</span></span><br><span class="line">wget https://dlm.mariadb.com/1936470/Connectors/odbc/connector-odbc-3.1.15/mariadb-connector-odbc-3.1.15-centos7-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 解压</span></span><br><span class="line">tar -zxvf mariadb-connector-odbc-3.1.15-centos7-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 接入解压包</span></span><br><span class="line">cd  mariadb-connector-odbc-*</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 安装库</span></span><br><span class="line">install lib64/mariadb/libmaodbc.so /usr/lib/</span><br><span class="line">install -d /usr/lib/mariadb/</span><br><span class="line">install -d /usr/lib/mariadb/plugin/</span><br><span class="line">install lib/mariadb/plugin/* /usr/lib/mariadb/plugin/</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置数据源"><a href="#配置数据源" class="headerlink" title="配置数据源"></a>配置数据源</h1><ol>
+<li>通过以下指令可以验证系统能否找到驱动</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">odbcinst -q -d</span><br><span class="line"></span><br><span class="line">[PostgreSQL]</span><br><span class="line">[MySQL]</span><br><span class="line">[MySQL ODBC 5.3 Unicode Driver]</span><br><span class="line">[MySQL ODBC 5.3 ANSI Driver]</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>如果没有需要进行配置</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 配置/etc/odbcinst.ini,如添加mariadb的驱动</span></span><br><span class="line">[MariaDB ODBC 3.1 Driver]</span><br><span class="line">Description=MariaDB Connector/ODBC v.3.1</span><br><span class="line">Driver=/usr/lib64/libmaodbc.so</span><br><span class="line">UsageCount=4</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>配置完成后，执行以下命令安装驱动程序</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">odbcinst -i -d -f /etc/odbcinst.ini</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>配置数据源参数, <code>/etc/odbc.ini</code></li>
+</ol>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[My-Test-Server]</span></span><br><span class="line"><span class="attr">Description</span> = Describe your database setup here</span><br><span class="line"><span class="attr">Driver</span>      = MariaDB ODBC <span class="number">3.1</span> Driver</span><br><span class="line"><span class="attr">Trace</span>       = <span class="literal">Yes</span></span><br><span class="line"><span class="attr">TraceFile</span>   = /tmp/trace.log</span><br><span class="line"><span class="attr">SERVER</span>      = localhost</span><br><span class="line"><span class="attr">SOCKET</span>      = /var/run/mysqld/mysqld.sock</span><br><span class="line"><span class="attr">USER</span>        = db_user</span><br><span class="line"><span class="attr">PASSWORD</span>    = db_user_password</span><br><span class="line"><span class="attr">DATABASE</span>    = tes</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>安装odbc数据源文件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">odbcinst -i -s -h -f /etc/odbc.ini</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>测试连接</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">isql My-Test-Server</span><br><span class="line"><span class="meta">#</span><span class="language-bash">看是否可以连接成功</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参考连接</li>
+<li><a href="https://mariadb.com/docs/clients/mariadb-connectors/connector-odbc/connect/">mariadb官方文档</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>odbc</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>mariadb</tag>
+        <tag>mysql</tag>
+        <tag>odbc</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>mariadb主从复制</title>
     <url>/posts/9451060a/</url>
     <content><![CDATA[<h3 id="摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）"><a href="#摘要：mariadb10-5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）" class="headerlink" title="摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）"></a>摘要：mariadb10.5在linux下的安装部署和基本配置（修改字符集，设置大小写不敏感，修改数据库连接数）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
@@ -1051,6 +1209,132 @@
       <tags>
         <tag>linux</tag>
         <tag>mariadb</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nginx+keepalived高可用</title>
+    <url>/posts/bc02660d/</url>
+    <content><![CDATA[<h3 id="摘要：nginx-keepalived-实现高可用（主备，双主模式）"><a href="#摘要：nginx-keepalived-实现高可用（主备，双主模式）" class="headerlink" title="摘要：nginx +keepalived 实现高可用（主备，双主模式）"></a>摘要：nginx +keepalived 实现高可用（主备，双主模式）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-02</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<h1 id="nginx-keepalived-高可用（主备）"><a href="#nginx-keepalived-高可用（主备）" class="headerlink" title="nginx+keepalived 高可用（主备）"></a>nginx+keepalived 高可用（主备）</h1><blockquote>
+<p>Keepalived 是一种高性能的服务器高可用或热备解决方案， Keepalived 可以用来防止服务器单点故障的发生，通过配合 Nginx 可以实现服务的高可用，Keepalived 以 VRRP 协议为实现基础，用 VRRP 协议来实现高可用性(HA)。 </p>
+<p>VRRP(Virtual RouterRedundancy Protocol)协议是用于实现路由器冗余的协议</p>
+<p>keepalived官网：<a href="https://www.keepalived.org/">https://www.keepalived.org</a></p>
+</blockquote>
+<h2 id="测试服务器准备"><a href="#测试服务器准备" class="headerlink" title="测试服务器准备"></a>测试服务器准备</h2><table>
+<thead>
+<tr>
+<th align="center">VIP</th>
+<th align="center">IP</th>
+<th align="center">PORT</th>
+<th align="center">主备</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">192.168.85.108</td>
+<td align="center">192.168.85.106</td>
+<td align="center">80(nginx)</td>
+<td align="center">MASTER</td>
+</tr>
+<tr>
+<td align="center">192.168.85.108</td>
+<td align="center">192.168.85.107</td>
+<td align="center">80(nginx)</td>
+<td align="center">BACKUP</td>
+</tr>
+</tbody></table>
+<h2 id="安装nginx和keepalive"><a href="#安装nginx和keepalive" class="headerlink" title="安装nginx和keepalive"></a>安装nginx和keepalive</h2><h3 id="nginx-安装（主备）"><a href="#nginx-安装（主备）" class="headerlink" title="nginx 安装（主备）"></a>nginx 安装（主备）</h3><ul>
+<li>安装nginx安装配置指南安装即可，本文档只是简单实现HA，故分别修改一下index.html加以区分</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 在body标签中增加本机ip --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>这是192.168.85.10X<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="配置keepalivedNginx-sh-脚本"><a href="#配置keepalivedNginx-sh-脚本" class="headerlink" title="配置keepalivedNginx.sh 脚本"></a>配置<code>keepalivedNginx.sh</code> 脚本</h3><ul>
+<li>vim <code>/etc/keepalived/keepalivedNginx.sh</code></li>
+<li>chmod +x /etc/keepalived/keepalivedNginx.sh</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">A=`pgrep nginx |<span class="built_in">wc</span> -l`</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$A</span> -eq 0 ];<span class="keyword">then</span></span><br><span class="line">  <span class="comment">#/usr/local/nginx/sbin/nginx #nginx命令的路径</span></span><br><span class="line">  currentime=`<span class="built_in">date</span> <span class="string">&quot;+%Y-%m-%d %H:%M:%S&quot;</span>`</span><br><span class="line">  <span class="comment">#/usr/sbin/nginx -c /etc/nginx/nginx.conf</span></span><br><span class="line">  systemctl start nginx</span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;nginx restart at <span class="variable">$currentime</span>  over !!!!!!&quot;</span> &gt;&gt; /opt/keepalived/monitornginx.log</span><br><span class="line">  <span class="built_in">sleep</span> 3</span><br><span class="line">  A=`pgrep nginx |<span class="built_in">wc</span> -l`</span><br><span class="line">  <span class="keyword">if</span> [ <span class="variable">$A</span> -eq 0 ];<span class="keyword">then</span></span><br><span class="line">    currentime=`<span class="built_in">date</span> <span class="string">&quot;+%Y-%m-%d %H:%M:%S&quot;</span>`</span><br><span class="line">    killall keepalived</span><br><span class="line">      <span class="built_in">echo</span> <span class="string">&quot;nginx restart at <span class="variable">$currentime</span> failed so kill keepalived!!!!!&quot;</span> &gt;&gt; /opt/keepaalived/monitornginx.log</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="keepalived安装"><a href="#keepalived安装" class="headerlink" title="keepalived安装"></a>keepalived安装</h3><ol>
+<li><p>下载依赖</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">yum install -y curl gcc openssl-devel libnl3-devel net-snmp-devel libnfnetlink-devel </span><br></pre></td></tr></table></figure></li>
+<li><p>下载并解压安装</p>
+</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 源码下载解压</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/src</span><br><span class="line">wget https://www.keepalived.org/software/keepalived-2.2.2.tar.gz</span><br><span class="line">tar -zxvf keepalived-2.2.2.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置编译安装</span></span><br><span class="line"><span class="built_in">cd</span> keepalived-1.2.18</span><br><span class="line">./configure --prefix=/data/keepalived --sysconf=/etc</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>配置开机自启</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 如果没有自启脚本可以直接复制源码中的，默认源码安装完成后会有的</span></span><br><span class="line">systemctl <span class="built_in">enable</span> keepalived</span><br><span class="line"><span class="built_in">cp</span> /usr/local/src/keepalived-2.2.2/keepalived/etc/sysconfig/keepalived /etc/sysconfig/</span><br><span class="line"><span class="comment">#centos 6使用以下脚本</span></span><br><span class="line"><span class="comment">#cp /usr/local/src/keepalived-2.2.2/keepalived/etc/init.d/keepalived /etc/init.d/</span></span><br><span class="line"><span class="comment">#chkconfig keepalived on</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个软连接</span></span><br><span class="line"><span class="built_in">ln</span> -s /data/keepalived/sbin/keepalived /usr/sbin/</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="配置keepalived"><a href="#配置keepalived" class="headerlink" title="配置keepalived"></a>配置keepalived</h3><h4 id="MASTER-（192-168-85-106）"><a href="#MASTER-（192-168-85-106）" class="headerlink" title="MASTER （192.168.85.106）"></a>MASTER （192.168.85.106）</h4><ul>
+<li>修改此 <code>/keepalived/keepalived.conf </code>配置文件</li>
+</ul>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line"><span class="comment">	## keepalived 自带的邮件提醒需要开启 sendmail 服务。 建议用独立的监控或第三方 SMTP</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">singlee ## 标识本节点的字条串，通常为 hostname</span></span><br><span class="line"><span class="attr">&#125;</span> <span class="string"></span></span><br><span class="line"><span class="comment">## keepalived 会定时执行脚本并对脚本执行的结果进行分析，动态调整 vrrp_instance 的优先级。如果脚本执行结果为 0，并且 weight 配置的值大于 0，则优先级相应的增加。如果脚本执行结果非 0，并且 weight配置的值小于 0，则优先级相应的减少。其他情况，维持原本配置的优先级，即配置文件中 priority 对应的值。</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot; ## 检测 nginx 状态的脚本路径</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2 ## 检测时间间隔</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20 ## 如果条件成立，权重-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment">## 定义虚拟路由， VI_1 为虚拟路由的标示符，自己定义名称</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">MASTER ## 主节点为 MASTER， 对应的备份节点为 BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33 ## 绑定虚拟 IP 的网络接口，与本机 IP 地址所在的网络接口相同</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33 ## 虚拟路由的 ID 号， 两个节点设置必须一样， 可选 IP 最后一段使用, 相同的 VRID 为一个组，他将决定多播的 MAC 地址</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.106 ## 本机 IP 地址</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">100 ## 节点优先级， 值范围 0-254， MASTER 要比 BACKUP 高</span></span><br><span class="line">	<span class="attr">nopreempt</span> <span class="string">## 优先级高的设置 nopreempt 解决异常恢复后再次抢占的问题</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1 ## 组播信息发送间隔，两个节点设置必须一样， 默认 1s</span></span><br><span class="line"><span class="comment">	## 设置验证信息，两个节点必须一致</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111 ## 真实生产，按需求对应该过来</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="comment">	## 将 track_script 块加入 instance 配置块</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span> <span class="string">## 执行 Nginx 监控的服务</span></span><br><span class="line">	<span class="attr">&#125;</span> <span class="string">#</span></span><br><span class="line"><span class="comment">	# 虚拟 IP 池, 两个节点设置必须一样</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span> <span class="string">## 虚拟 ip，可以定义多个</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="BACKUP-192-168-85-107"><a href="#BACKUP-192-168-85-107" class="headerlink" title="BACKUP (192.168.85.107)"></a>BACKUP (192.168.85.107)</h4><ul>
+<li>修改此 <code>/keepalived/keepalived.conf </code>配置文件</li>
+</ul>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">wangzw</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot;</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.107</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">90</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="配置clean-arp-sh"><a href="#配置clean-arp-sh" class="headerlink" title="配置clean_arp.sh"></a>配置clean_arp.sh</h3><blockquote>
+<p>自动更新vip的arp记录到网关</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line">VIP=$1</span><br><span class="line">GATEWAY=192.168.85.2</span><br><span class="line">/sbin/arping -I ens33 -c 5 -s $VIP $GATEWAY &amp;&gt;/dev/null  </span><br></pre></td></tr></table></figure>
+
+<h2 id="配置防火墙"><a href="#配置防火墙" class="headerlink" title="配置防火墙"></a>配置防火墙</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">#开启vrrp 协议  ens33是网卡名称</span></span><br><span class="line"><span class="attr">firewall-cmd</span> <span class="string">--direct --permanent --add-rule ipv4 filter INPUT 0 --in-interface ens33 --destination 224.0.0.18 --protocol vrrp -j ACCEPT</span></span><br><span class="line"></span><br><span class="line"><span class="attr">firewall-cmd</span> <span class="string">--reload</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">#如果使用的防火墙是iptables，在规则中添加一下内容</span></span><br><span class="line"><span class="comment">#master</span></span><br><span class="line"><span class="attr">-A</span> <span class="string">INPUT -i ens33 -p vrrp -s 192.168.85.107 -j ACCEPT #(192.168.85.107 从机IP)</span></span><br><span class="line"><span class="comment">#backup</span></span><br><span class="line"><span class="attr">-A</span> <span class="string">INPUT -i ens33 -p vrrp -s 192.168.85.106 -j ACCEPT #(192.168.85.16 主机IP)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="启动nginx-keepalived-测试HA"><a href="#启动nginx-keepalived-测试HA" class="headerlink" title="启动nginx keepalived,测试HA"></a>启动nginx keepalived,测试HA</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 分别启动主备服务器的nginx个keepalived</span></span><br><span class="line"><span class="comment"># 2. 使用虚拟ip访问,可以看到默认主就是106</span></span><br><span class="line"><span class="comment"># 3. 关闭106的nginx和keepalived  再次使用虚拟ip108访问，发现此时是指向107的，主备切换完成</span></span><br><span class="line"><span class="comment"># 4. 开启106的keepalived  重新使用虚拟ip108访问 发现此时指向的是106的nginx，主服务恢复</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="nginx-keepalived-高可用（双主）"><a href="#nginx-keepalived-高可用（双主）" class="headerlink" title="nginx+keepalived 高可用（双主）"></a>nginx+keepalived 高可用（双主）</h1><blockquote>
+<p>主备情况下一台服务器处于备份状态浪费资源</p>
+<p>双主情况下需要多一个vip，增加一个109的vip</p>
+</blockquote>
+<h2 id="master配置"><a href="#master配置" class="headerlink" title="master配置"></a>master配置</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line"><span class="comment">	## keepalived 自带的邮件提醒需要开启 sendmail 服务。 建议用独立的监控或第三方 SMTP</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">singlee ## 标识本节点的字条串，通常为 hostname</span></span><br><span class="line"><span class="attr">&#125;</span> <span class="string"></span></span><br><span class="line"><span class="comment">## keepalived 会定时执行脚本并对脚本执行的结果进行分析，动态调整 vrrp_instance 的优先级。如果脚本执行结果为 0，并且 weight 配置的值大于 0，则优先级相应的增加。如果脚本执行结果非 0，并且 weight配置的值小于 0，则优先级相应的减少。其他情况，维持原本配置的优先级，即配置文件中 priority 对应的值。</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot; ## 检测 nginx 状态的脚本路径</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2 ## 检测时间间隔</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20 ## 如果条件成立，权重-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment">## 定义虚拟路由， VI_1 为虚拟路由的标示符，自己定义名称</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">MASTER ## 主节点为 MASTER， 对应的备份节点为 BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33 ## 绑定虚拟 IP 的网络接口，与本机 IP 地址所在的网络接口相同</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33 ## 虚拟路由的 ID 号， 两个节点设置必须一样， 可选 IP 最后一段使用, 相同的 VRID 为一个组，他将决定多播的 MAC 地址</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.106 ## 本机 IP 地址</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">100 ## 节点优先级， 值范围 0-254， MASTER 要比 BACKUP 高</span></span><br><span class="line">	<span class="attr">nopreempt</span> <span class="string">## 优先级高的设置 nopreempt 解决异常恢复后再次抢占的问题</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1 ## 组播信息发送间隔，两个节点设置必须一样， 默认 1s</span></span><br><span class="line"><span class="comment">	## 设置验证信息，两个节点必须一致</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111 ## 真实生产，按需求改</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="comment">	## 将 track_script 块加入 instance 配置块</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span> <span class="string">## 执行 Nginx 监控的服务</span></span><br><span class="line">	<span class="attr">&#125;</span> <span class="string">#</span></span><br><span class="line"><span class="comment">	# 虚拟 IP 池, 两个节点设置必须一样</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span> <span class="string">## 虚拟 ip，可以定义多个</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="comment">	#当前节点成为master时，通知脚本执行任务</span></span><br><span class="line">	 <span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.108&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_2 &#123;  </span></span><br><span class="line">    <span class="attr">state</span> <span class="string">BACKUP  </span></span><br><span class="line">    <span class="attr">interface</span> <span class="string">ens33  </span></span><br><span class="line">    <span class="attr">virtual_router_id</span> <span class="string">52 </span></span><br><span class="line">    <span class="attr">mcast_src_ip</span> <span class="string">192.168.85.107</span></span><br><span class="line">    <span class="attr">priority</span> <span class="string">90  </span></span><br><span class="line">    <span class="attr">advert_int</span> <span class="string">1  </span></span><br><span class="line">    <span class="attr">authentication</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">auth_type</span> <span class="string">PASS  </span></span><br><span class="line">        <span class="attr">auth_pass</span> <span class="string">1111  </span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span> <span class="string"></span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">virtual_ipaddress</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">192.168.85.109</span> <span class="string"></span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.109&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="backup配置"><a href="#backup配置" class="headerlink" title="backup配置"></a>backup配置</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">wangzw</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot;</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.106</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">90</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.108&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_2 &#123;  </span></span><br><span class="line">    <span class="attr">state</span> <span class="string">MASTER  </span></span><br><span class="line">    <span class="attr">interface</span> <span class="string">ens33  </span></span><br><span class="line">    <span class="attr">virtual_router_id</span> <span class="string">52  </span></span><br><span class="line">    <span class="attr">mcast_src_ip</span> <span class="string">192.168.85.107</span></span><br><span class="line">    <span class="attr">priority</span> <span class="string">100 </span></span><br><span class="line">    <span class="attr">advert_int</span> <span class="string">1  </span></span><br><span class="line">    <span class="attr">authentication</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">auth_type</span> <span class="string">PASS  </span></span><br><span class="line">        <span class="attr">auth_pass</span> <span class="string">1111  </span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">        <span class="attr">chk_nginx</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">virtual_ipaddress</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">192.168.85.109</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.109&quot; </span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="脑裂"><a href="#脑裂" class="headerlink" title="脑裂"></a>脑裂</h2><blockquote>
+<p>由于keepalived体系中主备两台机器所处的状态与对方有关。如果主备机器之间的通信出了网题，就会发生脑裂，此时keepalived体系中会出现双主的情况，产生资源竞争。</p>
+</blockquote>
+<p>脑裂的几种原因：</p>
+<ol>
+<li><p>高可用服务器对之间心跳线链路发生故障，导致无法正常通信。</p>
+</li>
+<li><p>因网卡及相关驱动坏了，ip配置及冲突问题（网卡直连）。</p>
+</li>
+<li><p>因心跳线间连接的设备故障（网卡及交换机）。</p>
+</li>
+<li><p>因仲裁的机器出问题（采用仲裁的方案）。</p>
+</li>
+<li><p>高可用服务器上开启了 防火墙阻挡了心跳消息传输。</p>
+</li>
+<li><p>高可用服务器上心跳网卡地址等信息配置不正确，导致发送心跳失败。</p>
+</li>
+<li><p>其他服务配置不当等原因，如心跳方式不同，心跳广插冲突、软件Bug等。</p>
+</li>
+<li><p>Keepalived配置里同一 VRRP实例如果virtual_router_id两端参数配置不一致也会导致裂脑问题发生。</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>keepalived</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>nginx</tag>
+        <tag>keepalived</tag>
       </tags>
   </entry>
   <entry>
@@ -1326,473 +1610,6 @@
         <tag>centos</tag>
         <tag>nginx</tag>
         <tag>windows</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>nginx+keepalived高可用</title>
-    <url>/posts/bc02660d/</url>
-    <content><![CDATA[<h3 id="摘要：nginx-keepalived-实现高可用（主备，双主模式）"><a href="#摘要：nginx-keepalived-实现高可用（主备，双主模式）" class="headerlink" title="摘要：nginx +keepalived 实现高可用（主备，双主模式）"></a>摘要：nginx +keepalived 实现高可用（主备，双主模式）</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
-<thead>
-<tr>
-<th align="center">日期</th>
-<th align="center">内容</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">2022-02</td>
-<td align="center">新建文档</td>
-</tr>
-</tbody></table>
-<span id="more"></span>
-
-<h1 id="nginx-keepalived-高可用（主备）"><a href="#nginx-keepalived-高可用（主备）" class="headerlink" title="nginx+keepalived 高可用（主备）"></a>nginx+keepalived 高可用（主备）</h1><blockquote>
-<p>Keepalived 是一种高性能的服务器高可用或热备解决方案， Keepalived 可以用来防止服务器单点故障的发生，通过配合 Nginx 可以实现服务的高可用，Keepalived 以 VRRP 协议为实现基础，用 VRRP 协议来实现高可用性(HA)。 </p>
-<p>VRRP(Virtual RouterRedundancy Protocol)协议是用于实现路由器冗余的协议</p>
-<p>keepalived官网：<a href="https://www.keepalived.org/">https://www.keepalived.org</a></p>
-</blockquote>
-<h2 id="测试服务器准备"><a href="#测试服务器准备" class="headerlink" title="测试服务器准备"></a>测试服务器准备</h2><table>
-<thead>
-<tr>
-<th align="center">VIP</th>
-<th align="center">IP</th>
-<th align="center">PORT</th>
-<th align="center">主备</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">192.168.85.108</td>
-<td align="center">192.168.85.106</td>
-<td align="center">80(nginx)</td>
-<td align="center">MASTER</td>
-</tr>
-<tr>
-<td align="center">192.168.85.108</td>
-<td align="center">192.168.85.107</td>
-<td align="center">80(nginx)</td>
-<td align="center">BACKUP</td>
-</tr>
-</tbody></table>
-<h2 id="安装nginx和keepalive"><a href="#安装nginx和keepalive" class="headerlink" title="安装nginx和keepalive"></a>安装nginx和keepalive</h2><h3 id="nginx-安装（主备）"><a href="#nginx-安装（主备）" class="headerlink" title="nginx 安装（主备）"></a>nginx 安装（主备）</h3><ul>
-<li>安装nginx安装配置指南安装即可，本文档只是简单实现HA，故分别修改一下index.html加以区分</li>
-</ul>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 在body标签中增加本机ip --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>这是192.168.85.10X<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="配置keepalivedNginx-sh-脚本"><a href="#配置keepalivedNginx-sh-脚本" class="headerlink" title="配置keepalivedNginx.sh 脚本"></a>配置<code>keepalivedNginx.sh</code> 脚本</h3><ul>
-<li>vim <code>/etc/keepalived/keepalivedNginx.sh</code></li>
-<li>chmod +x /etc/keepalived/keepalivedNginx.sh</li>
-</ul>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">A=`pgrep nginx |<span class="built_in">wc</span> -l`</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$A</span> -eq 0 ];<span class="keyword">then</span></span><br><span class="line">  <span class="comment">#/usr/local/nginx/sbin/nginx #nginx命令的路径</span></span><br><span class="line">  currentime=`<span class="built_in">date</span> <span class="string">&quot;+%Y-%m-%d %H:%M:%S&quot;</span>`</span><br><span class="line">  <span class="comment">#/usr/sbin/nginx -c /etc/nginx/nginx.conf</span></span><br><span class="line">  systemctl start nginx</span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;nginx restart at <span class="variable">$currentime</span>  over !!!!!!&quot;</span> &gt;&gt; /opt/keepalived/monitornginx.log</span><br><span class="line">  <span class="built_in">sleep</span> 3</span><br><span class="line">  A=`pgrep nginx |<span class="built_in">wc</span> -l`</span><br><span class="line">  <span class="keyword">if</span> [ <span class="variable">$A</span> -eq 0 ];<span class="keyword">then</span></span><br><span class="line">    currentime=`<span class="built_in">date</span> <span class="string">&quot;+%Y-%m-%d %H:%M:%S&quot;</span>`</span><br><span class="line">    killall keepalived</span><br><span class="line">      <span class="built_in">echo</span> <span class="string">&quot;nginx restart at <span class="variable">$currentime</span> failed so kill keepalived!!!!!&quot;</span> &gt;&gt; /opt/keepaalived/monitornginx.log</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="keepalived安装"><a href="#keepalived安装" class="headerlink" title="keepalived安装"></a>keepalived安装</h3><ol>
-<li><p>下载依赖</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">yum install -y curl gcc openssl-devel libnl3-devel net-snmp-devel libnfnetlink-devel </span><br></pre></td></tr></table></figure></li>
-<li><p>下载并解压安装</p>
-</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 源码下载解压</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/src</span><br><span class="line">wget https://www.keepalived.org/software/keepalived-2.2.2.tar.gz</span><br><span class="line">tar -zxvf keepalived-2.2.2.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置编译安装</span></span><br><span class="line"><span class="built_in">cd</span> keepalived-1.2.18</span><br><span class="line">./configure --prefix=/data/keepalived --sysconf=/etc</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>配置开机自启</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 如果没有自启脚本可以直接复制源码中的，默认源码安装完成后会有的</span></span><br><span class="line">systemctl <span class="built_in">enable</span> keepalived</span><br><span class="line"><span class="built_in">cp</span> /usr/local/src/keepalived-2.2.2/keepalived/etc/sysconfig/keepalived /etc/sysconfig/</span><br><span class="line"><span class="comment">#centos 6使用以下脚本</span></span><br><span class="line"><span class="comment">#cp /usr/local/src/keepalived-2.2.2/keepalived/etc/init.d/keepalived /etc/init.d/</span></span><br><span class="line"><span class="comment">#chkconfig keepalived on</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个软连接</span></span><br><span class="line"><span class="built_in">ln</span> -s /data/keepalived/sbin/keepalived /usr/sbin/</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="配置keepalived"><a href="#配置keepalived" class="headerlink" title="配置keepalived"></a>配置keepalived</h3><h4 id="MASTER-（192-168-85-106）"><a href="#MASTER-（192-168-85-106）" class="headerlink" title="MASTER （192.168.85.106）"></a>MASTER （192.168.85.106）</h4><ul>
-<li>修改此 <code>/keepalived/keepalived.conf </code>配置文件</li>
-</ul>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line"><span class="comment">	## keepalived 自带的邮件提醒需要开启 sendmail 服务。 建议用独立的监控或第三方 SMTP</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">singlee ## 标识本节点的字条串，通常为 hostname</span></span><br><span class="line"><span class="attr">&#125;</span> <span class="string"></span></span><br><span class="line"><span class="comment">## keepalived 会定时执行脚本并对脚本执行的结果进行分析，动态调整 vrrp_instance 的优先级。如果脚本执行结果为 0，并且 weight 配置的值大于 0，则优先级相应的增加。如果脚本执行结果非 0，并且 weight配置的值小于 0，则优先级相应的减少。其他情况，维持原本配置的优先级，即配置文件中 priority 对应的值。</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot; ## 检测 nginx 状态的脚本路径</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2 ## 检测时间间隔</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20 ## 如果条件成立，权重-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment">## 定义虚拟路由， VI_1 为虚拟路由的标示符，自己定义名称</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">MASTER ## 主节点为 MASTER， 对应的备份节点为 BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33 ## 绑定虚拟 IP 的网络接口，与本机 IP 地址所在的网络接口相同</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33 ## 虚拟路由的 ID 号， 两个节点设置必须一样， 可选 IP 最后一段使用, 相同的 VRID 为一个组，他将决定多播的 MAC 地址</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.106 ## 本机 IP 地址</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">100 ## 节点优先级， 值范围 0-254， MASTER 要比 BACKUP 高</span></span><br><span class="line">	<span class="attr">nopreempt</span> <span class="string">## 优先级高的设置 nopreempt 解决异常恢复后再次抢占的问题</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1 ## 组播信息发送间隔，两个节点设置必须一样， 默认 1s</span></span><br><span class="line"><span class="comment">	## 设置验证信息，两个节点必须一致</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111 ## 真实生产，按需求对应该过来</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="comment">	## 将 track_script 块加入 instance 配置块</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span> <span class="string">## 执行 Nginx 监控的服务</span></span><br><span class="line">	<span class="attr">&#125;</span> <span class="string">#</span></span><br><span class="line"><span class="comment">	# 虚拟 IP 池, 两个节点设置必须一样</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span> <span class="string">## 虚拟 ip，可以定义多个</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="BACKUP-192-168-85-107"><a href="#BACKUP-192-168-85-107" class="headerlink" title="BACKUP (192.168.85.107)"></a>BACKUP (192.168.85.107)</h4><ul>
-<li>修改此 <code>/keepalived/keepalived.conf </code>配置文件</li>
-</ul>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">wangzw</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot;</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.107</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">90</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="配置clean-arp-sh"><a href="#配置clean-arp-sh" class="headerlink" title="配置clean_arp.sh"></a>配置clean_arp.sh</h3><blockquote>
-<p>自动更新vip的arp记录到网关</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line">VIP=$1</span><br><span class="line">GATEWAY=192.168.85.2</span><br><span class="line">/sbin/arping -I ens33 -c 5 -s $VIP $GATEWAY &amp;&gt;/dev/null  </span><br></pre></td></tr></table></figure>
-
-<h2 id="配置防火墙"><a href="#配置防火墙" class="headerlink" title="配置防火墙"></a>配置防火墙</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">#开启vrrp 协议  ens33是网卡名称</span></span><br><span class="line"><span class="attr">firewall-cmd</span> <span class="string">--direct --permanent --add-rule ipv4 filter INPUT 0 --in-interface ens33 --destination 224.0.0.18 --protocol vrrp -j ACCEPT</span></span><br><span class="line"></span><br><span class="line"><span class="attr">firewall-cmd</span> <span class="string">--reload</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">#如果使用的防火墙是iptables，在规则中添加一下内容</span></span><br><span class="line"><span class="comment">#master</span></span><br><span class="line"><span class="attr">-A</span> <span class="string">INPUT -i ens33 -p vrrp -s 192.168.85.107 -j ACCEPT #(192.168.85.107 从机IP)</span></span><br><span class="line"><span class="comment">#backup</span></span><br><span class="line"><span class="attr">-A</span> <span class="string">INPUT -i ens33 -p vrrp -s 192.168.85.106 -j ACCEPT #(192.168.85.16 主机IP)</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="启动nginx-keepalived-测试HA"><a href="#启动nginx-keepalived-测试HA" class="headerlink" title="启动nginx keepalived,测试HA"></a>启动nginx keepalived,测试HA</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 分别启动主备服务器的nginx个keepalived</span></span><br><span class="line"><span class="comment"># 2. 使用虚拟ip访问,可以看到默认主就是106</span></span><br><span class="line"><span class="comment"># 3. 关闭106的nginx和keepalived  再次使用虚拟ip108访问，发现此时是指向107的，主备切换完成</span></span><br><span class="line"><span class="comment"># 4. 开启106的keepalived  重新使用虚拟ip108访问 发现此时指向的是106的nginx，主服务恢复</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="nginx-keepalived-高可用（双主）"><a href="#nginx-keepalived-高可用（双主）" class="headerlink" title="nginx+keepalived 高可用（双主）"></a>nginx+keepalived 高可用（双主）</h1><blockquote>
-<p>主备情况下一台服务器处于备份状态浪费资源</p>
-<p>双主情况下需要多一个vip，增加一个109的vip</p>
-</blockquote>
-<h2 id="master配置"><a href="#master配置" class="headerlink" title="master配置"></a>master配置</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line"><span class="comment">	## keepalived 自带的邮件提醒需要开启 sendmail 服务。 建议用独立的监控或第三方 SMTP</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">singlee ## 标识本节点的字条串，通常为 hostname</span></span><br><span class="line"><span class="attr">&#125;</span> <span class="string"></span></span><br><span class="line"><span class="comment">## keepalived 会定时执行脚本并对脚本执行的结果进行分析，动态调整 vrrp_instance 的优先级。如果脚本执行结果为 0，并且 weight 配置的值大于 0，则优先级相应的增加。如果脚本执行结果非 0，并且 weight配置的值小于 0，则优先级相应的减少。其他情况，维持原本配置的优先级，即配置文件中 priority 对应的值。</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot; ## 检测 nginx 状态的脚本路径</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2 ## 检测时间间隔</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20 ## 如果条件成立，权重-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment">## 定义虚拟路由， VI_1 为虚拟路由的标示符，自己定义名称</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">MASTER ## 主节点为 MASTER， 对应的备份节点为 BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33 ## 绑定虚拟 IP 的网络接口，与本机 IP 地址所在的网络接口相同</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33 ## 虚拟路由的 ID 号， 两个节点设置必须一样， 可选 IP 最后一段使用, 相同的 VRID 为一个组，他将决定多播的 MAC 地址</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.106 ## 本机 IP 地址</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">100 ## 节点优先级， 值范围 0-254， MASTER 要比 BACKUP 高</span></span><br><span class="line">	<span class="attr">nopreempt</span> <span class="string">## 优先级高的设置 nopreempt 解决异常恢复后再次抢占的问题</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1 ## 组播信息发送间隔，两个节点设置必须一样， 默认 1s</span></span><br><span class="line"><span class="comment">	## 设置验证信息，两个节点必须一致</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111 ## 真实生产，按需求改</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="comment">	## 将 track_script 块加入 instance 配置块</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span> <span class="string">## 执行 Nginx 监控的服务</span></span><br><span class="line">	<span class="attr">&#125;</span> <span class="string">#</span></span><br><span class="line"><span class="comment">	# 虚拟 IP 池, 两个节点设置必须一样</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span> <span class="string">## 虚拟 ip，可以定义多个</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line"><span class="comment">	#当前节点成为master时，通知脚本执行任务</span></span><br><span class="line">	 <span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.108&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_2 &#123;  </span></span><br><span class="line">    <span class="attr">state</span> <span class="string">BACKUP  </span></span><br><span class="line">    <span class="attr">interface</span> <span class="string">ens33  </span></span><br><span class="line">    <span class="attr">virtual_router_id</span> <span class="string">52 </span></span><br><span class="line">    <span class="attr">mcast_src_ip</span> <span class="string">192.168.85.107</span></span><br><span class="line">    <span class="attr">priority</span> <span class="string">90  </span></span><br><span class="line">    <span class="attr">advert_int</span> <span class="string">1  </span></span><br><span class="line">    <span class="attr">authentication</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">auth_type</span> <span class="string">PASS  </span></span><br><span class="line">        <span class="attr">auth_pass</span> <span class="string">1111  </span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span> <span class="string"></span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">virtual_ipaddress</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">192.168.85.109</span> <span class="string"></span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.109&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="backup配置"><a href="#backup配置" class="headerlink" title="backup配置"></a>backup配置</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">! Configuration File for keepalived</span></span><br><span class="line"><span class="attr">global_defs</span> <span class="string">&#123;</span></span><br><span class="line">	<span class="attr">router_id</span> <span class="string">wangzw</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_script</span> <span class="string">chk_nginx &#123;</span></span><br><span class="line">	<span class="attr">script</span> <span class="string">&quot;/etc/keepalived/keepalivedNginx.sh&quot;</span></span><br><span class="line">	<span class="attr">interval</span> <span class="string">2</span></span><br><span class="line">	<span class="attr">weight</span> <span class="string">-20</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_1 &#123;</span></span><br><span class="line">	<span class="attr">state</span> <span class="string">BACKUP</span></span><br><span class="line">	<span class="attr">interface</span> <span class="string">ens33</span></span><br><span class="line">	<span class="attr">virtual_router_id</span> <span class="string">33</span></span><br><span class="line">	<span class="attr">mcast_src_ip</span> <span class="string">192.168.85.106</span></span><br><span class="line">	<span class="attr">priority</span> <span class="string">90</span></span><br><span class="line">	<span class="attr">advert_int</span> <span class="string">1</span></span><br><span class="line">	<span class="attr">authentication</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">auth_type</span> <span class="string">PASS</span></span><br><span class="line">		<span class="attr">auth_pass</span> <span class="string">1111</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">chk_nginx</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">virtual_ipaddress</span> <span class="string">&#123;</span></span><br><span class="line">		<span class="attr">192.168.85.108</span></span><br><span class="line">	<span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.108&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">vrrp_instance</span> <span class="string">VI_2 &#123;  </span></span><br><span class="line">    <span class="attr">state</span> <span class="string">MASTER  </span></span><br><span class="line">    <span class="attr">interface</span> <span class="string">ens33  </span></span><br><span class="line">    <span class="attr">virtual_router_id</span> <span class="string">52  </span></span><br><span class="line">    <span class="attr">mcast_src_ip</span> <span class="string">192.168.85.107</span></span><br><span class="line">    <span class="attr">priority</span> <span class="string">100 </span></span><br><span class="line">    <span class="attr">advert_int</span> <span class="string">1  </span></span><br><span class="line">    <span class="attr">authentication</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">auth_type</span> <span class="string">PASS  </span></span><br><span class="line">        <span class="attr">auth_pass</span> <span class="string">1111  </span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">track_script</span> <span class="string">&#123;</span></span><br><span class="line">        <span class="attr">chk_nginx</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">virtual_ipaddress</span> <span class="string">&#123;  </span></span><br><span class="line">        <span class="attr">192.168.85.109</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">&#125;</span>  <span class="string"></span></span><br><span class="line">    <span class="attr">notify_master</span> <span class="string">&quot;/etc/keepalived/clean_arp.sh  192.168.85.109&quot; </span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="脑裂"><a href="#脑裂" class="headerlink" title="脑裂"></a>脑裂</h2><blockquote>
-<p>由于keepalived体系中主备两台机器所处的状态与对方有关。如果主备机器之间的通信出了网题，就会发生脑裂，此时keepalived体系中会出现双主的情况，产生资源竞争。</p>
-</blockquote>
-<p>脑裂的几种原因：</p>
-<ol>
-<li><p>高可用服务器对之间心跳线链路发生故障，导致无法正常通信。</p>
-</li>
-<li><p>因网卡及相关驱动坏了，ip配置及冲突问题（网卡直连）。</p>
-</li>
-<li><p>因心跳线间连接的设备故障（网卡及交换机）。</p>
-</li>
-<li><p>因仲裁的机器出问题（采用仲裁的方案）。</p>
-</li>
-<li><p>高可用服务器上开启了 防火墙阻挡了心跳消息传输。</p>
-</li>
-<li><p>高可用服务器上心跳网卡地址等信息配置不正确，导致发送心跳失败。</p>
-</li>
-<li><p>其他服务配置不当等原因，如心跳方式不同，心跳广插冲突、软件Bug等。</p>
-</li>
-<li><p>Keepalived配置里同一 VRRP实例如果virtual_router_id两端参数配置不一致也会导致裂脑问题发生。</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>keepalived</category>
-      </categories>
-      <tags>
-        <tag>centos</tag>
-        <tag>nginx</tag>
-        <tag>keepalived</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>redis安装部署指南</title>
-    <url>/posts/f6030cf0/</url>
-    <content><![CDATA[<h3 id="摘要：redis在linux下的安装部署，哨兵模式，集群模式"><a href="#摘要：redis在linux下的安装部署，哨兵模式，集群模式" class="headerlink" title="摘要：redis在linux下的安装部署，哨兵模式，集群模式"></a>摘要：redis在linux下的安装部署，哨兵模式，集群模式</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
-<thead>
-<tr>
-<th align="center">日期</th>
-<th align="center">内容</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">2022-02</td>
-<td align="center">新建文档</td>
-</tr>
-</tbody></table>
-<span id="more"></span>
-
-<h1 id="一、redis安装"><a href="#一、redis安装" class="headerlink" title="一、redis安装"></a>一、redis安装</h1><blockquote>
-<p>redis官网：<a href="https://redis.io/download">https://redis.io/download</a></p>
-<p>注：如果没有特殊版本要求，在centos下可以直接 <code>yum install -y redis</code> 此版本3</p>
-</blockquote>
-<h2 id="1-下载并解压"><a href="#1-下载并解压" class="headerlink" title="1. 下载并解压"></a>1. 下载并解压</h2><ul>
-<li><p>目前最新稳定版本为6.2.4</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 直接下载到/data</span></span><br><span class="line">wget https://download.redis.io/releases/redis-6.2.4.tar.gz -O /data/redis.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.解压并重命名</span></span><br><span class="line"><span class="built_in">mkdir</span> /data/redis &amp;&amp; tar -zxvf /data/redis.tar.gz -C /data/redis --strip-components 1</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="2-编译"><a href="#2-编译" class="headerlink" title="2. 编译"></a>2. 编译</h2><ul>
-<li><p>安装到/data/redis里，方便管理</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 进入到源码包里</span></span><br><span class="line"><span class="built_in">cd</span> /data/redis</span><br><span class="line"><span class="comment"># 2. 编译并安装 PREFIX=指定程序存放的路径</span></span><br><span class="line">make &amp;&amp; make PREFIX=/data/redis install</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="3-修改配置文件"><a href="#3-修改配置文件" class="headerlink" title="3. 修改配置文件"></a>3. 修改配置文件</h2><ul>
-<li>不建议使用<code>utils/install_server.sh</code>进行配置</li>
-</ul>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 修改redis配置文件</span></span><br><span class="line"><span class="attr">vim</span> <span class="string">/data/redis/redis.conf</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 2. 将daemonize no 改为yes代表后台运行</span></span><br><span class="line"><span class="attr">daemonize</span> <span class="string">yes</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 3.修改pid的名称</span></span><br><span class="line"><span class="attr">pidfile</span> <span class="string">/var/run/redis.pid</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 4.记录log</span></span><br><span class="line"><span class="attr">logfile</span> <span class="string">&quot;/data/redis/redis.log&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="4-添加开机启动"><a href="#4-添加开机启动" class="headerlink" title="4. 添加开机启动"></a>4. 添加开机启动</h2><ul>
-<li> redis自带有脚本  <code>utils/redis_init_script</code> ,如果是按照文档上文安装的此处需要修改一下</li>
-</ul>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 修改以下选项</span></span><br><span class="line"><span class="comment"># 配置实际路径</span></span><br><span class="line">EXEC=/data/redis/bin/redis-server</span><br><span class="line">CLIEXEC=/data/redis/bin/redis-cli</span><br><span class="line">CONF=<span class="string">&quot;/data/redis/redis.conf&quot;</span></span><br><span class="line">PIDFILE=/var/run/redis.pid</span><br><span class="line"></span><br><span class="line"><span class="comment">#============================= 非必要  =============================</span></span><br><span class="line"><span class="comment"># 如果更改了端口号 请在脚本中也做出修改</span></span><br><span class="line">REDISPORT=16379</span><br><span class="line"><span class="comment">#如果你使用了密码验证 请修改此脚本，增加密码 在stop中增加-a</span></span><br><span class="line">PASSWD=Abc.123</span><br><span class="line"><span class="variable">$CLIEXEC</span> -p <span class="variable">$REDISPORT</span> -a <span class="variable">$PASSWD</span> shutdown</span><br><span class="line"><span class="comment">#============================= end  =============================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 复制脚本文件</span></span><br><span class="line"><span class="built_in">cp</span> /data/redis/utils/redis_init_script /etc/init.d/redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 开机自启</span></span><br><span class="line">chkconfig redis on</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4.启动 | 关闭 | 检查</span></span><br><span class="line">systemctl start | stop | status redis</span><br><span class="line"><span class="comment"># 或 service管理</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="5-redis-conf-几个重要配置"><a href="#5-redis-conf-几个重要配置" class="headerlink" title="5. redis.conf 几个重要配置"></a>5. redis.conf 几个重要配置</h2><table>
-<thead>
-<tr>
-<th>配置项名称</th>
-<th>配置项值范围</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>daemonize</td>
-<td>yes、no</td>
-<td>yes表示启用守护进程，默认是no即不以守护进程方式运行。其中Windows系统下不支持启用守护进程方式运行</td>
-</tr>
-<tr>
-<td>port</td>
-<td>默认端口为 6379</td>
-<td>指定 Redis 监听端口，</td>
-</tr>
-<tr>
-<td>bind</td>
-<td>默认127.0.0.1</td>
-<td>绑定的主机地址,如果需要设置远程访问则直接将这个属性备注下或者改为bind * 即可,这个属性和下面的protected-mode控制了是否可以远程访问 。</td>
-</tr>
-<tr>
-<td>protected-mode</td>
-<td>yes 、no</td>
-<td>保护模式，该模式控制外部网是否可以连接redis服务，默认是yes,所以默认我们外网是无法访问的，如需外网连接rendis服务则需要将此属性改为no。</td>
-</tr>
-<tr>
-<td>timeout</td>
-<td>300</td>
-<td>当客户端闲置多长时间后关闭连接，如果指定为 0，表示关闭该功能</td>
-</tr>
-<tr>
-<td>loglevel</td>
-<td>debug、verbose、notice、warning</td>
-<td>日志级别，默认为 notice</td>
-</tr>
-<tr>
-<td>databases</td>
-<td>16</td>
-<td>设置数据库的数量，默认的数据库是0。整个通过客户端工具可以看得到</td>
-</tr>
-<tr>
-<td>rdbcompression</td>
-<td>yes、no</td>
-<td>指定存储至本地数据库时是否压缩数据，默认为 yes，Redis 采用 LZF 压缩，如果为了节省 CPU 时间，可以关闭该选项，但会导致数据库文件变的巨大。</td>
-</tr>
-<tr>
-<td>dbfilename</td>
-<td>dump.rdb</td>
-<td>指定本地数据库文件名，默认值为 dump.rdb</td>
-</tr>
-<tr>
-<td>dir</td>
-<td></td>
-<td>指定本地数据库存放目录</td>
-</tr>
-<tr>
-<td>requirepass</td>
-<td></td>
-<td>设置 Redis 连接密码，如果配置了连接密码，客户端在连接 Redis 时需要通过 AUTH <password> 命令提供密码，默认关闭</td>
-</tr>
-<tr>
-<td>maxclients</td>
-<td>0</td>
-<td>设置同一时间最大客户端连接数，默认无限制，Redis 可以同时打开的客户端连接数为 Redis 进程可以打开的最大文件描述符数，如果设置 maxclients 0，表示不作限制。当客户端连接数到达限制时，Redis 会关闭新的连接并向客户端返回 max number of clients reached 错误信息。</td>
-</tr>
-<tr>
-<td>maxmemory</td>
-<td>XXX <bytes></td>
-<td>指定 Redis 最大内存限制，Redis 在启动时会把数据加载到内存中，达到最大内存后，Redis 会先尝试清除已到期或即将到期的 Key，当此方法处理 后，仍然到达最大内存设置，将无法再进行写入操作，但仍然可以进行读取操作。Redis 新的 vm 机制，会把 Key 存放内存，Value 会存放在 swap 区。配置项值范围列里XXX为数值。</td>
-</tr>
-</tbody></table>
-<h2 id="7-两个警告处理"><a href="#7-两个警告处理" class="headerlink" title="7. 两个警告处理"></a>7. 两个警告处理</h2><ol>
-<li><p>WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.</p>
-<ul>
-<li><p>原因：对一个高负载的环境来说tcp设置128这个值，太小了</p>
-</li>
-<li><p>解决办法</p>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 编辑sysctl.conf</span></span><br><span class="line"><span class="attr">vim</span> <span class="string">/etc/sysctl.conf</span></span><br><span class="line"><span class="comment"># 增加以下内容</span></span><br><span class="line"><span class="attr">net.core.somaxconn</span>=<span class="string">1024</span></span><br><span class="line"><span class="comment">#立即生效</span></span><br><span class="line"><span class="attr">sysctl</span> <span class="string">-p</span></span><br></pre></td></tr></table></figure></li>
-<li><p>补充</p>
-<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line">net.core.somaxconn 介绍</span><br><span class="line">1）概念介绍</span><br><span class="line">  对于一个TCP链接，Server与Client需要通过三次握手来建立网络链接，当三次握手成功之后，我们就可以看到端口状态由LISTEN转为ESTABLISHED，接着这条链路上就可以开始传送数据了</span><br><span class="line"></span><br><span class="line">net.core.somaxconn是Linux中的一个内核(kernel)参数，表示socket监听(listen)的backlog上限。</span><br><span class="line">什么是backlog？backlog就是socket的监听队列，当一个请求(request)尚未被处理或者建立时，它就会进入backlog。</span><br><span class="line">而socket server可以一次性处理backlog中的所有请求，处理后的请求不再位于监听队列中。</span><br><span class="line">当Server处理请求较慢时，导致监听队列被填满后，新来的请求就会被拒绝。</span><br><span class="line"></span><br><span class="line">2）补充</span><br><span class="line">Linux系统中，该参数的值默认是128</span><br><span class="line">如果Linux系统中部署了经常处理新请求(request)的高负载的服务，那么显然这个值是需要增加到更合适的值的</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add ‘vm.overcommit_memory = 1’ to /etc/sysctl.conf and then reboot or run the command ‘sysctl vm.overcommit_memory=1’ for this to take effect.</p>
-<ul>
-<li><p>原因：警告overcommit_memory设置为0! 在内存不足的情况下，后台保存可能失败</p>
-</li>
-<li><p>解决办法</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">编辑sysctl.conf</span></span><br><span class="line">vim /etc/sysctl.conf</span><br><span class="line"><span class="meta"># </span><span class="language-bash">增加以下内容</span></span><br><span class="line">vm.overcommit_memory=1</span><br><span class="line"><span class="meta">#</span><span class="language-bash">立即生效</span></span><br><span class="line">sysctl -p</span><br></pre></td></tr></table></figure></li>
-<li><p>补充</p>
-<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line">overcommit<span class="built_in">_</span>memory有什么作用？  </span><br><span class="line">     overcommit<span class="built_in">_</span>memory取值又三种分别为0， 1， 2</span><br><span class="line"></span><br><span class="line">    overcommit<span class="built_in">_</span>memory=0， 表示内核将检查是否有足够的可用内存供应用进程使用；如果有足够的可用内存，内存申请允许；否则，内存申请失败，并把错误返回给应用进程。</span><br><span class="line">    overcommit<span class="built_in">_</span>memory=1， 表示内核允许分配所有的物理内存，而不管当前的内存状态如何。</span><br><span class="line">    overcommit<span class="built_in">_</span>memory=2， 表示内核允许分配超过所有物理内存和交换空间总和的内存</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ol>
-<h1 id="二、redis主从"><a href="#二、redis主从" class="headerlink" title="二、redis主从"></a>二、redis主从</h1><blockquote>
-<p>master: 192.168.85.107 16379</p>
-<p>slave: 192.168.85.115 16380</p>
-<p>slave: 192.168.85.106 16381</p>
-</blockquote>
-<ul>
-<li><p>主从复制模式中，主要是从节点配置</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">slaveof 192.168.85.107 16379  #作为192.168.1.100这台服务器的从服务器  在6版本之前为replicof</span><br><span class="line"></span><br><span class="line">replica-read-only   yes  #从服务器只读，写操作在主服务器上，实现读写分离</span><br><span class="line"></span><br><span class="line">repl-timeout 60 #从库复制超时时间，数据很多的话需要调长，否则主从会断开</span><br><span class="line"></span><br><span class="line">repl-backlog-size 1M #从服务离线之后，主服务器会把离线之后的写入命令存储在一个特定大小的队列中，避免短时间断开服务却进行全量同步的问题</span><br><span class="line"></span><br><span class="line">repl-diskless-sync yes #开启无盘复制，主从全量同步时，主库并不会在本地创建RDB 文件，而是创建一个子进程通过Socket将RDB文件写入到从服务器，节约IO资源</span><br><span class="line"></span><br><span class="line">client-output-buffer-limit replica 256mb 64mb 60  #客户端输出缓冲区配置。每个客户端连接（包括从库）后都会申请一个buffer空间，通过该选项限制可以避免buffer持续增长消耗内存。如果超过限制主库会强制断开连接，也就是说从库处理慢导致主库buffer积压达到限制后主库会强制断开从库的连接，此时主从复制会中断，中断后如果从库再次发起复制请求还会继续被断开导致恶性循环，引发复制风暴。调为0则不限制，</span><br><span class="line"><span class="meta">#</span><span class="language-bash">大小限制是256M，持续性限制是当客户端缓冲区大小持续60秒超过64M，则关闭客户端连接。</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">client-output-buffer-limit normal 0 0 0</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">client-output-buffer-limit replica 256mb 64mb 60</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">client-output-buffer-limit pubsub 8mb 2mb 60</span></span><br><span class="line"></span><br><span class="line">masterauth 123456789  #主库如果配置了密码，这里需要配置正确的密码</span><br></pre></td></tr></table></figure></li>
-<li><p>查看是否成功</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 进入redis-cli客户端查看</span></span><br><span class="line">info replication</span><br></pre></td></tr></table></figure></li>
-<li><p>当master挂掉之后，可以使用以下命令让slave成为master</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">SLAVEOF NO ONE</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h1 id="三、哨兵模式"><a href="#三、哨兵模式" class="headerlink" title="三、哨兵模式"></a>三、哨兵模式</h1><p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204011703644.png"></p>
-<blockquote>
-<p>1.每个Sentinel进程以每秒钟一次的频率向整个集群中的Master主服务器，Slave从服务器以及其他Sentinel进程发送一个 PING 命令。<br>2.如果一个实例（instance）距离最后一次有效回复 PING 命令的时间超过 down-after-milliseconds 选项所指定的值， 则这个实例会被Sentinel进程标记为SDOWN。<br>3.如果一个Master主服务器被标记为SDOWN，则正在监视这个Master主服务器的所有 Sentinel进程要以每秒一次的频率确认Master主服务器的确进入了主观下线状态。<br>4.当有足够数量的Sentinel进程（大于等于配置文件指定的值）在指定的时间范围内确认Master主服务器进入了SDOWN， 则Master主服务器会被标记为客观下线ODOWN。<br>5.在一般情况下， 每个Sentinel进程会以每10 秒一次的频率向集群中的所有Master主服务器、Slave从服务器发送INFO命令。<br>当Master主服务器被Sentinel进程标记为ODOWN时，Sentinel进程向下线的Master主服务器的所有Slave从服务器发送INFO命令的频率会从 10 秒一次改为每秒一次。<br>6.若没有足够数量的Sentinel进程同意 Master主服务器下线， Master主服务器的客观下线状态就会被移除。若Master主服务器重新向Sentinel进程发送 PING 命令返回有效回复，Master主服务器的主观下线状态就会被移除。</p>
-</blockquote>
-<h2 id="3-1-配置"><a href="#3-1-配置" class="headerlink" title="3.1 配置"></a>3.1 配置</h2><ul>
-<li>基于主从增加sentinel.conf 配置  节点为奇数，文档中使用了三个sentinel节点，每个节点都需要配置，主要不同为端口号</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">port 26379</span><br><span class="line">dir &quot;/data/redis/26379&quot;</span><br><span class="line">logfile &quot;/data/redis/redis-sentinel.log&quot;</span><br><span class="line"><span class="meta">#</span><span class="language-bash">配置主节点的IP和端口，2代表主节点判断失败至少需要2个Sentinel节点同意，一般设置为Sentinel节点数的一半加1.</span></span><br><span class="line">sentinel monitor mymaster 192.168.85.106 6379 2</span><br><span class="line"><span class="meta">#</span><span class="language-bash">30秒ping不通主节点的信息，主观认为master宕机</span></span><br><span class="line">sentinel down-after-milliseconds mymaster 30000</span><br><span class="line"><span class="meta">#</span><span class="language-bash">故障转移时从节点同时向新主发起复制请求的数量，1代表从节点会轮询发起复制。</span></span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line"><span class="meta">#</span><span class="language-bash">故障转移开始，180秒内没有完成，则认为转移失败</span></span><br><span class="line">sentinel failover-timeout mymaster 180000</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-2-启动并测试"><a href="#3-2-启动并测试" class="headerlink" title="3.2 启动并测试"></a>3.2 启动并测试</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 启动 /data/redis/bin</span></span><br><span class="line">./redis-sentinel ../sentinel.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看哨兵状态 -p 端口为哨兵节点的端口</span></span><br><span class="line">./redis-cli -p 26379</span><br><span class="line"></span><br><span class="line">$ 127.0.0.1:26379&gt; info sentinel</span><br><span class="line"><span class="comment"># Sentinel</span></span><br><span class="line">sentinel_masters:1</span><br><span class="line">sentinel_tilt:0</span><br><span class="line">sentinel_running_scripts:0</span><br><span class="line">sentinel_scripts_queue_length:0</span><br><span class="line">sentinel_simulate_failure_flags:0</span><br><span class="line">master0:name=mymaster,status=ok,address=127.0.0.1:6379,slaves=0,sentinels=3</span><br><span class="line"></span><br><span class="line"><span class="comment"># 同时可查看106 107的redis.conf配置文件发生变化  107的sentinel配置文件也发生了变化 </span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>测试故障转移</li>
-</ul>
-<blockquote>
-<p>故障转移的大体步骤如下：</p>
-<ol>
-<li>每个Sentinel节点每隔1秒对主、从、其他Sentinel阶段发送ping探测，超过down-after-milliseconds未返回响应，则判断该节点主观下线。</li>
-<li>Sentinel节点向其他Sentinel节点询问对于异常节点的判断，当达到 quorum个sentinel节点都认为被主观下线的节点异常时，则对该节点做客观下线。</li>
-<li>在sentinel节点中通过Raft算法选举出一个leader来完成故障转移。</li>
-<li>当出现故障的节点是主节点时，sentinel leader会根据优先级、复制偏移量、runid等在从节点中选出一个作为主节点，执行slaveof no one命令。</li>
-<li>leader向其他从节点发送指令，让他们成为新主的从节点，并将原来的主节点更新为从节点，当旧主恢复后去复制新主的数据。</li>
-<li>复制完成后，发布主节点的切换消息。</li>
-</ol>
-</blockquote>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. kill 掉 106 master进程</span></span><br><span class="line"><span class="built_in">kill</span> -9 5677</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 查看转移情况 -- master转移到107上</span></span><br><span class="line"><span class="variable">$127</span>.0.0.1:26379&gt; info sentinel</span><br><span class="line"><span class="comment"># Sentinel</span></span><br><span class="line">sentinel_masters:1</span><br><span class="line">sentinel_tilt:0</span><br><span class="line">sentinel_running_scripts:0</span><br><span class="line">sentinel_scripts_queue_length:0</span><br><span class="line">sentinel_simulate_failure_flags:0</span><br><span class="line">master0:name=mymaster,status=ok,address=192.168.85.107:6380,slaves=2,sentinels=3</span><br><span class="line"></span><br><span class="line">127.0.0.1:6380&gt; info replication</span><br><span class="line"><span class="comment"># Replication</span></span><br><span class="line">role:master</span><br><span class="line">connected_slaves:2</span><br><span class="line">slave0:ip=192.168.85.115,port=6381,state=online,offset=129383,lag=0</span><br><span class="line">slave1:ip=192.168.85.106,port=6379,state=online,offset=129383,lag=1</span><br><span class="line">master_replid:782dc289609fee05ac15e618dbc1d99c1180484d</span><br><span class="line">master_replid2:755d8165585452a9ed4d03aef0d0522bf6e8290b</span><br><span class="line">master_repl_offset:129669</span><br><span class="line">second_repl_offset:35062</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:3823</span><br><span class="line">repl_backlog_histlen:125847</span><br></pre></td></tr></table></figure>
-
-<h1 id="四、-集群"><a href="#四、-集群" class="headerlink" title="四、 集群"></a>四、 集群</h1><blockquote>
-<p><strong>Redis集群(Redis Cluster)</strong> 是Redis提供的分布式数据库方案，通过 <strong>分片(sharding)</strong> 来进行数据共享，并提供复制和故障转移功能。相比于主从复制、哨兵模式，Redis集群实现了较为完善的高可用方案，解决了存储能力受到单机限制，写操作无法负载均衡的问题。</p>
-</blockquote>
-<ul>
-<li>集群的搭建可以分为四步：</li>
-</ul>
-<ol>
-<li><p>启动节点：将节点以集群方式启动，此时节点是独立的。</p>
-</li>
-<li><p>节点握手：将独立的节点连成网络。</p>
-<p>2.1. 在redis5之前需要使用CLUSTER MEET</p>
-</li>
-<li><p>槽指派：将16384个槽位分配给主节点，以达到分片保存数据库键值对的效果。</p>
-<p>3.1. Redis集群通过分片(sharding)的方式保存数据库的键值对，整个数据库被分为16384个槽(slot)，数据库每个键都属于这16384个槽的一个，集群中的每个节点都可以处理0个或者最多16384个slot。</p>
-<p>3.2 槽是数据管理和迁移的基本单位。当数据库中的16384个槽都分配了节点时，集群处于上线状态（ok）；如果有任意一个槽没有分配节点，则集群处于下线状态（fail）</p>
-<p>3.3  CLUSTER ADDSLOTS redis5之前需要手动指定</p>
-</li>
-<li><p>主从复制：为从节点指定主节点。redis5之前需要CLUSTER REPLICATE <node_id></p>
-</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th align="center">IP</th>
-<th align="center">PORT（master）</th>
-<th align="center">port（slave）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">192.168.85.106</td>
-<td align="center">6379（16379）</td>
-<td align="center">26379（36379）</td>
-</tr>
-<tr>
-<td align="center">192.168.85.107</td>
-<td align="center">6380（16380）</td>
-<td align="center">26380（36380）</td>
-</tr>
-<tr>
-<td align="center">192.168.85.115</td>
-<td align="center">6381（16381）</td>
-<td align="center">26381（36381）</td>
-</tr>
-</tbody></table>
-<h2 id="4-1-安装redis"><a href="#4-1-安装redis" class="headerlink" title="4.1  安装redis"></a>4.1  安装redis</h2><ol>
-<li><p>按照redis编译安装</p>
-</li>
-<li><p>基础配置</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 在每个节点上创建以下内容 分别存放配置文件  日志 pid  数据</span></span><br><span class="line"><span class="built_in">cd</span> /data/redis</span><br><span class="line"><span class="built_in">mkdir</span> conf <span class="built_in">log</span> run data  </span><br><span class="line"><span class="comment"># 106中</span></span><br><span class="line"><span class="built_in">mkdir</span> -p data/6379 data/26379</span><br><span class="line"><span class="comment"># 107中</span></span><br><span class="line"><span class="built_in">mkdir</span> -p data/6380 data/26380</span><br><span class="line"><span class="comment"># 115</span></span><br><span class="line"><span class="built_in">mkdir</span> -p data/6381 data/26381</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="4-2-配置节点"><a href="#4-2-配置节点" class="headerlink" title="4.2 配置节点"></a>4.2 配置节点</h2><ol>
-<li><p>先配置6379节点，后续直接复制修改即可</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 一 、复制redis.conf</span></span><br><span class="line"><span class="built_in">cp</span> /data/redis/redis.conf conf/redis_6379.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改以下内容</span></span><br><span class="line"><span class="comment"># 二、允许远程访问</span></span><br><span class="line"><span class="comment">#1. 注释掉下面代码，或者改为 bind 0.0.0.0</span></span><br><span class="line"><span class="built_in">bind</span> 0.0.0.0</span><br><span class="line"><span class="comment">#2. 关闭保护模式</span></span><br><span class="line">protected-mode no</span><br><span class="line"></span><br><span class="line"><span class="comment"># 二.通用配置</span></span><br><span class="line"><span class="comment">#1. 开启守护进程</span></span><br><span class="line">daemonize <span class="built_in">yes</span></span><br><span class="line"><span class="comment">#2. 配置密码（必须设置相同的密码，不设masterauth的话宕机了不能自动恢复）</span></span><br><span class="line"><span class="comment">#requirepass tdfdsfnkinki.net</span></span><br><span class="line"><span class="comment">#集群节点间的访问密码</span></span><br><span class="line"><span class="comment">#masterauth tdfdsfnkinki.net</span></span><br><span class="line"><span class="comment"># 持久化类型</span></span><br><span class="line">appendonly <span class="built_in">yes</span></span><br><span class="line">appendfilename <span class="string">&quot;appendonly-6379.aof&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 三.集群配置</span></span><br><span class="line">port 7000 <span class="comment">#配置端口</span></span><br><span class="line">cluster-enabled <span class="built_in">yes</span> <span class="comment">#开启集群</span></span><br><span class="line">cluster-config-file nodes-6379.conf  <span class="comment">#集群节点配置文件</span></span><br><span class="line">pidfile /root/data/redis/run/6379.pid <span class="comment">#进程文件ID对应文件</span></span><br><span class="line">cluster-node-timeout 5000 <span class="comment">#集群节点超时时间，超过这个时间，集群认为该节点故障，如果是主节点，会进行相应的主从切换</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 四.配置对应目录</span></span><br><span class="line">logfile /root/data/redis/log/6379.log <span class="comment">#日志文件</span></span><br><span class="line"><span class="built_in">dir</span> /root/data/redis/data/6379 <span class="comment">#目录要提前创建好</span></span><br></pre></td></tr></table></figure></li>
-<li><p>将redis_6379.conf 复制到其它节点做以下修改</p>
-</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 主要是有关端口的，更换为实际端口</span></span><br><span class="line">appendfilename <span class="string">&quot;appendonly-6379.aof&quot;</span></span><br><span class="line">port 6379 </span><br><span class="line">cluster-config-file nodes-6379.conf </span><br><span class="line">pidfile /root/data/redis/run/redis_6379.pid </span><br><span class="line">logfile /root/data/redis/log/redis_6379.log </span><br><span class="line"><span class="built_in">dir</span> /root/data/redis/data/6379 </span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>启动各redis节点</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /data/redis/bin</span><br><span class="line">./redis-server ../conf/redis_6379.conf</span><br><span class="line">./redis-server ../conf/redis_16379.conf</span><br><span class="line"><span class="comment"># 指定各节点配置</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="4-3-启动并测试"><a href="#4-3-启动并测试" class="headerlink" title="4.3 启动并测试"></a>4.3 启动并测试</h2><ol>
-<li>配置集群</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在Redis 5.0之后直接利用 redis-cli 完成集群配置</span></span><br><span class="line"><span class="comment">#--cluster-replicas 1 指示给定的创建节点列表是以主节点+从节点对组成的</span></span><br><span class="line"><span class="comment">#主从的对应关系可通过cluster nodes看到</span></span><br><span class="line">./redis-cli  --cluster create 192.168.85.106:6379   192.168.85.107:6380 192.168.85.115:6381  192.168.85.106:26379 192.168.85.107:26380 192.168.85.115:26381 --cluster-replicas 1</span><br><span class="line"></span><br><span class="line"><span class="comment"># cluster 其它操作</span></span><br><span class="line"><span class="comment"># 查看节点信息 </span></span><br><span class="line">cluster nodes</span><br><span class="line"><span class="comment">#节点id: 由40个16进制字符串组成，节点id只在集群初始化时创建一次，然后保存到集群配置文件（即前文提到的cluster-config-file）中，以后节点重新启动时会直接在集群配置文件中读取。</span></span><br><span class="line"><span class="comment">#port@cport: 前者为普通端口，用于为客户端提供服务；后者为集群端口，分配方法为：普通端口+10000，只用于节点间的通讯。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看集群信息</span></span><br><span class="line">cluster info</span><br><span class="line"><span class="comment"># 查看槽位信息</span></span><br><span class="line">cluster slots</span><br><span class="line"><span class="comment"># 计算某个key的槽位</span></span><br><span class="line">cluster keyslot xxx</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>测试集群</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli -p 6379b -c</span><br><span class="line"><span class="comment">#-c 指定是集群模式连接 如果不加-c  如果key不在当前节点槽位会直接报错，不会主动重定向</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>模拟故障</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># shutdown掉6379 看其slave会主动成为master，当6379恢复时会自动成为slave运行</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="4-4-集群伸缩"><a href="#4-4-集群伸缩" class="headerlink" title="4.4 集群伸缩"></a>4.4 集群伸缩</h2><h3 id="4-4-1-添加节点"><a href="#4-4-1-添加节点" class="headerlink" title="4.4.1 添加节点"></a>4.4.1 添加节点</h3><ol>
-<li>增加两个节点</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th>IP</th>
-<th>PORT（主）</th>
-<th>PORT（从）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>192.168.85.115</td>
-<td>8682(18682）</td>
-<td>28682（38682）</td>
-</tr>
-</tbody></table>
-<ol start="2">
-<li>配置节点并启动</li>
-<li>节点握手，借助 redis-cli –cluster add-node 命令分别添加节点8682和28682</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli --cluster add-node 192.168.85.115:8682 192.168.85.106:6379</span><br><span class="line">./redis-cli --cluster add-node 192.168.85.115:28682 192.168.85.106:6379</span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li>重新分片,借助 redis-cli –cluster reshard 命令对集群重新分片，使得各节点槽位均衡</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 移动的槽位数：最终平均每个主节点有4096个slot，所以每个节点移动</span></span><br><span class="line"><span class="comment"># 接收槽位的目标节点ID：节点6382的ID</span></span><br><span class="line"><span class="comment"># 移出槽位的源节点ID：节点6379/6380/6381的ID</span></span><br><span class="line">./redis-cli --cluster reshard 192.168.85.115:8682</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li>设置主从关系</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli -p 28682 cluster replicate f3a55c3544dd6633d3eab7657e25d569afb69ea0 </span><br></pre></td></tr></table></figure>
-
-<h3 id="4-4-2-删除节点"><a href="#4-4-2-删除节点" class="headerlink" title="4.4.2 删除节点"></a>4.4.2 删除节点</h3><ul>
-<li>将8682 28682两个节点删除</li>
-</ul>
-<ol>
-<li>重新分片，将8682节点上的槽位全部转移到节点6379上</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli --cluster reshard 192.168.85.106:6379</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>删除节点</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli --cluster del-node 192.168.85.115:8682 f3a55c3544dd6633d3eab7657e25d569afb69ea0</span><br><span class="line"></span><br><span class="line">./redis-cli --cluster del-node 192.168.85.115:28682 de555118a46ccedc65cc7f578d243a580d30360f</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>redis</category>
-      </categories>
-      <tags>
-        <tag>linux</tag>
-        <tag>redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>sudo配置规则.md</title>
-    <url>/posts/ecad03f9/</url>
-    <content><![CDATA[<h3 id="摘要：sudo的规则配置"><a href="#摘要：sudo的规则配置" class="headerlink" title="摘要：sudo的规则配置"></a>摘要：sudo的规则配置</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
-<thead>
-<tr>
-<th align="center">日期</th>
-<th align="center">内容</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">2022-04</td>
-<td align="center">新建文档</td>
-</tr>
-</tbody></table>
-<span id="more"></span>
-
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">用户sudo授权：</span><br><span class="line">visudo</span><br><span class="line"><span class="comment">## Allow root to run any commands anywhere</span></span><br><span class="line">root    ALL=(ALL)       ALL</span><br><span class="line">user    ALL=(root)      NOPASSWD:ALL,!/sbin/shutdown,!/sbin/init,!/bin/<span class="built_in">rm</span> <span class="literal">-rf</span> /</span><br><span class="line"></span><br><span class="line">解释说明：</span><br><span class="line"><span class="number">1</span>）第一个字段user指定的是用户：可以是用户名，也可以是别名。每个用户设置一行，多个用户设置多行，也可以将多个用户设置成一个别名后再进行设置。</span><br><span class="line"><span class="number">2</span>）第二个字段ALL指定的是用户所在的主机：可以是ip,也可以是主机名，表示该sudo设置只在该主机上生效，ALL表示在所有主机上都生效！限制的一般都是本机，也就是限制使用这个文件的主机;一般都指定为<span class="string">&quot;ALL&quot;</span>表示所有的主机，不管文件拷到那里都可以用。比如：<span class="number">10.1</span>.<span class="number">1.1</span>=...则表示只在当前主机生效。</span><br><span class="line"><span class="number">3</span>）第三个字段（root）括号里指定的也是用户：指定以什么用户身份执行sudo，即使用sudo后可以享有所有root账号下的权限。如果要排除个别用户，可以在括号内设置，比如ALL=(ALL,!oracle,!pos)。</span><br><span class="line"><span class="number">4</span>）第四个字段ALL指定的是执行的命令：即使用sudo后可以执行所有的命令。除了关机和删除根内容以外；也可以设置别名。NOPASSWD: ALL表示使用sudo的不需要输入密码。</span><br><span class="line"><span class="number">5</span>）也可以授权给一个用户组</span><br><span class="line">	%admin ALL=(ALL) ALL	表示admin组里的所有成员可以在任何主机上以任何用户身份执行任何命令</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>参考连接</li>
-<li><a href="https://juejin.cn/post/6992609027234463758">Linux sudo和sudoers详解！</a></li>
-<li><a href="https://www.sogou.com/link?url=hedJjaC291OSi_i_Ca0srR5OmlBS3kcCytWslkz0jklZeKmuPWg0fw..">sudo配置文件详解</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>shell</category>
-      </categories>
-      <tags>
-        <tag>centos</tag>
-        <tag>shell</tag>
       </tags>
   </entry>
   <entry>
@@ -2229,9 +2046,317 @@
       </tags>
   </entry>
   <entry>
-    <title>Prometheus+Grafana部署系统监控</title>
-    <url>/posts/2047dd97/</url>
-    <content><![CDATA[<h3 id="摘要：Prometheus-Grafana部署系统监控"><a href="#摘要：Prometheus-Grafana部署系统监控" class="headerlink" title="摘要：Prometheus+Grafana部署系统监控"></a>摘要：Prometheus+Grafana部署系统监控</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
+    <title>redis安装部署指南</title>
+    <url>/posts/f6030cf0/</url>
+    <content><![CDATA[<h3 id="摘要：redis在linux下的安装部署，哨兵模式，集群模式"><a href="#摘要：redis在linux下的安装部署，哨兵模式，集群模式" class="headerlink" title="摘要：redis在linux下的安装部署，哨兵模式，集群模式"></a>摘要：redis在linux下的安装部署，哨兵模式，集群模式</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-02</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<h1 id="一、redis安装"><a href="#一、redis安装" class="headerlink" title="一、redis安装"></a>一、redis安装</h1><blockquote>
+<p>redis官网：<a href="https://redis.io/download">https://redis.io/download</a></p>
+<p>注：如果没有特殊版本要求，在centos下可以直接 <code>yum install -y redis</code> 此版本3</p>
+</blockquote>
+<h2 id="1-下载并解压"><a href="#1-下载并解压" class="headerlink" title="1. 下载并解压"></a>1. 下载并解压</h2><ul>
+<li><p>目前最新稳定版本为6.2.4</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 直接下载到/data</span></span><br><span class="line">wget https://download.redis.io/releases/redis-6.2.4.tar.gz -O /data/redis.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.解压并重命名</span></span><br><span class="line"><span class="built_in">mkdir</span> /data/redis &amp;&amp; tar -zxvf /data/redis.tar.gz -C /data/redis --strip-components 1</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="2-编译"><a href="#2-编译" class="headerlink" title="2. 编译"></a>2. 编译</h2><ul>
+<li><p>安装到/data/redis里，方便管理</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 进入到源码包里</span></span><br><span class="line"><span class="built_in">cd</span> /data/redis</span><br><span class="line"><span class="comment"># 2. 编译并安装 PREFIX=指定程序存放的路径</span></span><br><span class="line">make &amp;&amp; make PREFIX=/data/redis install</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="3-修改配置文件"><a href="#3-修改配置文件" class="headerlink" title="3. 修改配置文件"></a>3. 修改配置文件</h2><ul>
+<li>不建议使用<code>utils/install_server.sh</code>进行配置</li>
+</ul>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 修改redis配置文件</span></span><br><span class="line"><span class="attr">vim</span> <span class="string">/data/redis/redis.conf</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 2. 将daemonize no 改为yes代表后台运行</span></span><br><span class="line"><span class="attr">daemonize</span> <span class="string">yes</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 3.修改pid的名称</span></span><br><span class="line"><span class="attr">pidfile</span> <span class="string">/var/run/redis.pid</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 4.记录log</span></span><br><span class="line"><span class="attr">logfile</span> <span class="string">&quot;/data/redis/redis.log&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-添加开机启动"><a href="#4-添加开机启动" class="headerlink" title="4. 添加开机启动"></a>4. 添加开机启动</h2><ul>
+<li> redis自带有脚本  <code>utils/redis_init_script</code> ,如果是按照文档上文安装的此处需要修改一下</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 修改以下选项</span></span><br><span class="line"><span class="comment"># 配置实际路径</span></span><br><span class="line">EXEC=/data/redis/bin/redis-server</span><br><span class="line">CLIEXEC=/data/redis/bin/redis-cli</span><br><span class="line">CONF=<span class="string">&quot;/data/redis/redis.conf&quot;</span></span><br><span class="line">PIDFILE=/var/run/redis.pid</span><br><span class="line"></span><br><span class="line"><span class="comment">#============================= 非必要  =============================</span></span><br><span class="line"><span class="comment"># 如果更改了端口号 请在脚本中也做出修改</span></span><br><span class="line">REDISPORT=16379</span><br><span class="line"><span class="comment">#如果你使用了密码验证 请修改此脚本，增加密码 在stop中增加-a</span></span><br><span class="line">PASSWD=Abc.123</span><br><span class="line"><span class="variable">$CLIEXEC</span> -p <span class="variable">$REDISPORT</span> -a <span class="variable">$PASSWD</span> shutdown</span><br><span class="line"><span class="comment">#============================= end  =============================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 复制脚本文件</span></span><br><span class="line"><span class="built_in">cp</span> /data/redis/utils/redis_init_script /etc/init.d/redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 开机自启</span></span><br><span class="line">chkconfig redis on</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4.启动 | 关闭 | 检查</span></span><br><span class="line">systemctl start | stop | status redis</span><br><span class="line"><span class="comment"># 或 service管理</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="5-redis-conf-几个重要配置"><a href="#5-redis-conf-几个重要配置" class="headerlink" title="5. redis.conf 几个重要配置"></a>5. redis.conf 几个重要配置</h2><table>
+<thead>
+<tr>
+<th>配置项名称</th>
+<th>配置项值范围</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>daemonize</td>
+<td>yes、no</td>
+<td>yes表示启用守护进程，默认是no即不以守护进程方式运行。其中Windows系统下不支持启用守护进程方式运行</td>
+</tr>
+<tr>
+<td>port</td>
+<td>默认端口为 6379</td>
+<td>指定 Redis 监听端口，</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>默认127.0.0.1</td>
+<td>绑定的主机地址,如果需要设置远程访问则直接将这个属性备注下或者改为bind * 即可,这个属性和下面的protected-mode控制了是否可以远程访问 。</td>
+</tr>
+<tr>
+<td>protected-mode</td>
+<td>yes 、no</td>
+<td>保护模式，该模式控制外部网是否可以连接redis服务，默认是yes,所以默认我们外网是无法访问的，如需外网连接rendis服务则需要将此属性改为no。</td>
+</tr>
+<tr>
+<td>timeout</td>
+<td>300</td>
+<td>当客户端闲置多长时间后关闭连接，如果指定为 0，表示关闭该功能</td>
+</tr>
+<tr>
+<td>loglevel</td>
+<td>debug、verbose、notice、warning</td>
+<td>日志级别，默认为 notice</td>
+</tr>
+<tr>
+<td>databases</td>
+<td>16</td>
+<td>设置数据库的数量，默认的数据库是0。整个通过客户端工具可以看得到</td>
+</tr>
+<tr>
+<td>rdbcompression</td>
+<td>yes、no</td>
+<td>指定存储至本地数据库时是否压缩数据，默认为 yes，Redis 采用 LZF 压缩，如果为了节省 CPU 时间，可以关闭该选项，但会导致数据库文件变的巨大。</td>
+</tr>
+<tr>
+<td>dbfilename</td>
+<td>dump.rdb</td>
+<td>指定本地数据库文件名，默认值为 dump.rdb</td>
+</tr>
+<tr>
+<td>dir</td>
+<td></td>
+<td>指定本地数据库存放目录</td>
+</tr>
+<tr>
+<td>requirepass</td>
+<td></td>
+<td>设置 Redis 连接密码，如果配置了连接密码，客户端在连接 Redis 时需要通过 AUTH <password> 命令提供密码，默认关闭</td>
+</tr>
+<tr>
+<td>maxclients</td>
+<td>0</td>
+<td>设置同一时间最大客户端连接数，默认无限制，Redis 可以同时打开的客户端连接数为 Redis 进程可以打开的最大文件描述符数，如果设置 maxclients 0，表示不作限制。当客户端连接数到达限制时，Redis 会关闭新的连接并向客户端返回 max number of clients reached 错误信息。</td>
+</tr>
+<tr>
+<td>maxmemory</td>
+<td>XXX <bytes></td>
+<td>指定 Redis 最大内存限制，Redis 在启动时会把数据加载到内存中，达到最大内存后，Redis 会先尝试清除已到期或即将到期的 Key，当此方法处理 后，仍然到达最大内存设置，将无法再进行写入操作，但仍然可以进行读取操作。Redis 新的 vm 机制，会把 Key 存放内存，Value 会存放在 swap 区。配置项值范围列里XXX为数值。</td>
+</tr>
+</tbody></table>
+<h2 id="7-两个警告处理"><a href="#7-两个警告处理" class="headerlink" title="7. 两个警告处理"></a>7. 两个警告处理</h2><ol>
+<li><p>WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.</p>
+<ul>
+<li><p>原因：对一个高负载的环境来说tcp设置128这个值，太小了</p>
+</li>
+<li><p>解决办法</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 编辑sysctl.conf</span></span><br><span class="line"><span class="attr">vim</span> <span class="string">/etc/sysctl.conf</span></span><br><span class="line"><span class="comment"># 增加以下内容</span></span><br><span class="line"><span class="attr">net.core.somaxconn</span>=<span class="string">1024</span></span><br><span class="line"><span class="comment">#立即生效</span></span><br><span class="line"><span class="attr">sysctl</span> <span class="string">-p</span></span><br></pre></td></tr></table></figure></li>
+<li><p>补充</p>
+<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line">net.core.somaxconn 介绍</span><br><span class="line">1）概念介绍</span><br><span class="line">  对于一个TCP链接，Server与Client需要通过三次握手来建立网络链接，当三次握手成功之后，我们就可以看到端口状态由LISTEN转为ESTABLISHED，接着这条链路上就可以开始传送数据了</span><br><span class="line"></span><br><span class="line">net.core.somaxconn是Linux中的一个内核(kernel)参数，表示socket监听(listen)的backlog上限。</span><br><span class="line">什么是backlog？backlog就是socket的监听队列，当一个请求(request)尚未被处理或者建立时，它就会进入backlog。</span><br><span class="line">而socket server可以一次性处理backlog中的所有请求，处理后的请求不再位于监听队列中。</span><br><span class="line">当Server处理请求较慢时，导致监听队列被填满后，新来的请求就会被拒绝。</span><br><span class="line"></span><br><span class="line">2）补充</span><br><span class="line">Linux系统中，该参数的值默认是128</span><br><span class="line">如果Linux系统中部署了经常处理新请求(request)的高负载的服务，那么显然这个值是需要增加到更合适的值的</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add ‘vm.overcommit_memory = 1’ to /etc/sysctl.conf and then reboot or run the command ‘sysctl vm.overcommit_memory=1’ for this to take effect.</p>
+<ul>
+<li><p>原因：警告overcommit_memory设置为0! 在内存不足的情况下，后台保存可能失败</p>
+</li>
+<li><p>解决办法</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">编辑sysctl.conf</span></span><br><span class="line">vim /etc/sysctl.conf</span><br><span class="line"><span class="meta"># </span><span class="language-bash">增加以下内容</span></span><br><span class="line">vm.overcommit_memory=1</span><br><span class="line"><span class="meta">#</span><span class="language-bash">立即生效</span></span><br><span class="line">sysctl -p</span><br></pre></td></tr></table></figure></li>
+<li><p>补充</p>
+<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line">overcommit<span class="built_in">_</span>memory有什么作用？  </span><br><span class="line">     overcommit<span class="built_in">_</span>memory取值又三种分别为0， 1， 2</span><br><span class="line"></span><br><span class="line">    overcommit<span class="built_in">_</span>memory=0， 表示内核将检查是否有足够的可用内存供应用进程使用；如果有足够的可用内存，内存申请允许；否则，内存申请失败，并把错误返回给应用进程。</span><br><span class="line">    overcommit<span class="built_in">_</span>memory=1， 表示内核允许分配所有的物理内存，而不管当前的内存状态如何。</span><br><span class="line">    overcommit<span class="built_in">_</span>memory=2， 表示内核允许分配超过所有物理内存和交换空间总和的内存</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h1 id="二、redis主从"><a href="#二、redis主从" class="headerlink" title="二、redis主从"></a>二、redis主从</h1><blockquote>
+<p>master: 192.168.85.107 16379</p>
+<p>slave: 192.168.85.115 16380</p>
+<p>slave: 192.168.85.106 16381</p>
+</blockquote>
+<ul>
+<li><p>主从复制模式中，主要是从节点配置</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">slaveof 192.168.85.107 16379  #作为192.168.1.100这台服务器的从服务器  在6版本之前为replicof</span><br><span class="line"></span><br><span class="line">replica-read-only   yes  #从服务器只读，写操作在主服务器上，实现读写分离</span><br><span class="line"></span><br><span class="line">repl-timeout 60 #从库复制超时时间，数据很多的话需要调长，否则主从会断开</span><br><span class="line"></span><br><span class="line">repl-backlog-size 1M #从服务离线之后，主服务器会把离线之后的写入命令存储在一个特定大小的队列中，避免短时间断开服务却进行全量同步的问题</span><br><span class="line"></span><br><span class="line">repl-diskless-sync yes #开启无盘复制，主从全量同步时，主库并不会在本地创建RDB 文件，而是创建一个子进程通过Socket将RDB文件写入到从服务器，节约IO资源</span><br><span class="line"></span><br><span class="line">client-output-buffer-limit replica 256mb 64mb 60  #客户端输出缓冲区配置。每个客户端连接（包括从库）后都会申请一个buffer空间，通过该选项限制可以避免buffer持续增长消耗内存。如果超过限制主库会强制断开连接，也就是说从库处理慢导致主库buffer积压达到限制后主库会强制断开从库的连接，此时主从复制会中断，中断后如果从库再次发起复制请求还会继续被断开导致恶性循环，引发复制风暴。调为0则不限制，</span><br><span class="line"><span class="meta">#</span><span class="language-bash">大小限制是256M，持续性限制是当客户端缓冲区大小持续60秒超过64M，则关闭客户端连接。</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">client-output-buffer-limit normal 0 0 0</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">client-output-buffer-limit replica 256mb 64mb 60</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">client-output-buffer-limit pubsub 8mb 2mb 60</span></span><br><span class="line"></span><br><span class="line">masterauth 123456789  #主库如果配置了密码，这里需要配置正确的密码</span><br></pre></td></tr></table></figure></li>
+<li><p>查看是否成功</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 进入redis-cli客户端查看</span></span><br><span class="line">info replication</span><br></pre></td></tr></table></figure></li>
+<li><p>当master挂掉之后，可以使用以下命令让slave成为master</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">SLAVEOF NO ONE</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="三、哨兵模式"><a href="#三、哨兵模式" class="headerlink" title="三、哨兵模式"></a>三、哨兵模式</h1><p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204011703644.png"></p>
+<blockquote>
+<p>1.每个Sentinel进程以每秒钟一次的频率向整个集群中的Master主服务器，Slave从服务器以及其他Sentinel进程发送一个 PING 命令。<br>2.如果一个实例（instance）距离最后一次有效回复 PING 命令的时间超过 down-after-milliseconds 选项所指定的值， 则这个实例会被Sentinel进程标记为SDOWN。<br>3.如果一个Master主服务器被标记为SDOWN，则正在监视这个Master主服务器的所有 Sentinel进程要以每秒一次的频率确认Master主服务器的确进入了主观下线状态。<br>4.当有足够数量的Sentinel进程（大于等于配置文件指定的值）在指定的时间范围内确认Master主服务器进入了SDOWN， 则Master主服务器会被标记为客观下线ODOWN。<br>5.在一般情况下， 每个Sentinel进程会以每10 秒一次的频率向集群中的所有Master主服务器、Slave从服务器发送INFO命令。<br>当Master主服务器被Sentinel进程标记为ODOWN时，Sentinel进程向下线的Master主服务器的所有Slave从服务器发送INFO命令的频率会从 10 秒一次改为每秒一次。<br>6.若没有足够数量的Sentinel进程同意 Master主服务器下线， Master主服务器的客观下线状态就会被移除。若Master主服务器重新向Sentinel进程发送 PING 命令返回有效回复，Master主服务器的主观下线状态就会被移除。</p>
+</blockquote>
+<h2 id="3-1-配置"><a href="#3-1-配置" class="headerlink" title="3.1 配置"></a>3.1 配置</h2><ul>
+<li>基于主从增加sentinel.conf 配置  节点为奇数，文档中使用了三个sentinel节点，每个节点都需要配置，主要不同为端口号</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">port 26379</span><br><span class="line">dir &quot;/data/redis/26379&quot;</span><br><span class="line">logfile &quot;/data/redis/redis-sentinel.log&quot;</span><br><span class="line"><span class="meta">#</span><span class="language-bash">配置主节点的IP和端口，2代表主节点判断失败至少需要2个Sentinel节点同意，一般设置为Sentinel节点数的一半加1.</span></span><br><span class="line">sentinel monitor mymaster 192.168.85.106 6379 2</span><br><span class="line"><span class="meta">#</span><span class="language-bash">30秒ping不通主节点的信息，主观认为master宕机</span></span><br><span class="line">sentinel down-after-milliseconds mymaster 30000</span><br><span class="line"><span class="meta">#</span><span class="language-bash">故障转移时从节点同时向新主发起复制请求的数量，1代表从节点会轮询发起复制。</span></span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line"><span class="meta">#</span><span class="language-bash">故障转移开始，180秒内没有完成，则认为转移失败</span></span><br><span class="line">sentinel failover-timeout mymaster 180000</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-启动并测试"><a href="#3-2-启动并测试" class="headerlink" title="3.2 启动并测试"></a>3.2 启动并测试</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 启动 /data/redis/bin</span></span><br><span class="line">./redis-sentinel ../sentinel.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看哨兵状态 -p 端口为哨兵节点的端口</span></span><br><span class="line">./redis-cli -p 26379</span><br><span class="line"></span><br><span class="line">$ 127.0.0.1:26379&gt; info sentinel</span><br><span class="line"><span class="comment"># Sentinel</span></span><br><span class="line">sentinel_masters:1</span><br><span class="line">sentinel_tilt:0</span><br><span class="line">sentinel_running_scripts:0</span><br><span class="line">sentinel_scripts_queue_length:0</span><br><span class="line">sentinel_simulate_failure_flags:0</span><br><span class="line">master0:name=mymaster,status=ok,address=127.0.0.1:6379,slaves=0,sentinels=3</span><br><span class="line"></span><br><span class="line"><span class="comment"># 同时可查看106 107的redis.conf配置文件发生变化  107的sentinel配置文件也发生了变化 </span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>测试故障转移</li>
+</ul>
+<blockquote>
+<p>故障转移的大体步骤如下：</p>
+<ol>
+<li>每个Sentinel节点每隔1秒对主、从、其他Sentinel阶段发送ping探测，超过down-after-milliseconds未返回响应，则判断该节点主观下线。</li>
+<li>Sentinel节点向其他Sentinel节点询问对于异常节点的判断，当达到 quorum个sentinel节点都认为被主观下线的节点异常时，则对该节点做客观下线。</li>
+<li>在sentinel节点中通过Raft算法选举出一个leader来完成故障转移。</li>
+<li>当出现故障的节点是主节点时，sentinel leader会根据优先级、复制偏移量、runid等在从节点中选出一个作为主节点，执行slaveof no one命令。</li>
+<li>leader向其他从节点发送指令，让他们成为新主的从节点，并将原来的主节点更新为从节点，当旧主恢复后去复制新主的数据。</li>
+<li>复制完成后，发布主节点的切换消息。</li>
+</ol>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. kill 掉 106 master进程</span></span><br><span class="line"><span class="built_in">kill</span> -9 5677</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 查看转移情况 -- master转移到107上</span></span><br><span class="line"><span class="variable">$127</span>.0.0.1:26379&gt; info sentinel</span><br><span class="line"><span class="comment"># Sentinel</span></span><br><span class="line">sentinel_masters:1</span><br><span class="line">sentinel_tilt:0</span><br><span class="line">sentinel_running_scripts:0</span><br><span class="line">sentinel_scripts_queue_length:0</span><br><span class="line">sentinel_simulate_failure_flags:0</span><br><span class="line">master0:name=mymaster,status=ok,address=192.168.85.107:6380,slaves=2,sentinels=3</span><br><span class="line"></span><br><span class="line">127.0.0.1:6380&gt; info replication</span><br><span class="line"><span class="comment"># Replication</span></span><br><span class="line">role:master</span><br><span class="line">connected_slaves:2</span><br><span class="line">slave0:ip=192.168.85.115,port=6381,state=online,offset=129383,lag=0</span><br><span class="line">slave1:ip=192.168.85.106,port=6379,state=online,offset=129383,lag=1</span><br><span class="line">master_replid:782dc289609fee05ac15e618dbc1d99c1180484d</span><br><span class="line">master_replid2:755d8165585452a9ed4d03aef0d0522bf6e8290b</span><br><span class="line">master_repl_offset:129669</span><br><span class="line">second_repl_offset:35062</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:3823</span><br><span class="line">repl_backlog_histlen:125847</span><br></pre></td></tr></table></figure>
+
+<h1 id="四、-集群"><a href="#四、-集群" class="headerlink" title="四、 集群"></a>四、 集群</h1><blockquote>
+<p><strong>Redis集群(Redis Cluster)</strong> 是Redis提供的分布式数据库方案，通过 <strong>分片(sharding)</strong> 来进行数据共享，并提供复制和故障转移功能。相比于主从复制、哨兵模式，Redis集群实现了较为完善的高可用方案，解决了存储能力受到单机限制，写操作无法负载均衡的问题。</p>
+</blockquote>
+<ul>
+<li>集群的搭建可以分为四步：</li>
+</ul>
+<ol>
+<li><p>启动节点：将节点以集群方式启动，此时节点是独立的。</p>
+</li>
+<li><p>节点握手：将独立的节点连成网络。</p>
+<p>2.1. 在redis5之前需要使用CLUSTER MEET</p>
+</li>
+<li><p>槽指派：将16384个槽位分配给主节点，以达到分片保存数据库键值对的效果。</p>
+<p>3.1. Redis集群通过分片(sharding)的方式保存数据库的键值对，整个数据库被分为16384个槽(slot)，数据库每个键都属于这16384个槽的一个，集群中的每个节点都可以处理0个或者最多16384个slot。</p>
+<p>3.2 槽是数据管理和迁移的基本单位。当数据库中的16384个槽都分配了节点时，集群处于上线状态（ok）；如果有任意一个槽没有分配节点，则集群处于下线状态（fail）</p>
+<p>3.3  CLUSTER ADDSLOTS redis5之前需要手动指定</p>
+</li>
+<li><p>主从复制：为从节点指定主节点。redis5之前需要CLUSTER REPLICATE <node_id></p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">IP</th>
+<th align="center">PORT（master）</th>
+<th align="center">port（slave）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">192.168.85.106</td>
+<td align="center">6379（16379）</td>
+<td align="center">26379（36379）</td>
+</tr>
+<tr>
+<td align="center">192.168.85.107</td>
+<td align="center">6380（16380）</td>
+<td align="center">26380（36380）</td>
+</tr>
+<tr>
+<td align="center">192.168.85.115</td>
+<td align="center">6381（16381）</td>
+<td align="center">26381（36381）</td>
+</tr>
+</tbody></table>
+<h2 id="4-1-安装redis"><a href="#4-1-安装redis" class="headerlink" title="4.1  安装redis"></a>4.1  安装redis</h2><ol>
+<li><p>按照redis编译安装</p>
+</li>
+<li><p>基础配置</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 在每个节点上创建以下内容 分别存放配置文件  日志 pid  数据</span></span><br><span class="line"><span class="built_in">cd</span> /data/redis</span><br><span class="line"><span class="built_in">mkdir</span> conf <span class="built_in">log</span> run data  </span><br><span class="line"><span class="comment"># 106中</span></span><br><span class="line"><span class="built_in">mkdir</span> -p data/6379 data/26379</span><br><span class="line"><span class="comment"># 107中</span></span><br><span class="line"><span class="built_in">mkdir</span> -p data/6380 data/26380</span><br><span class="line"><span class="comment"># 115</span></span><br><span class="line"><span class="built_in">mkdir</span> -p data/6381 data/26381</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="4-2-配置节点"><a href="#4-2-配置节点" class="headerlink" title="4.2 配置节点"></a>4.2 配置节点</h2><ol>
+<li><p>先配置6379节点，后续直接复制修改即可</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 一 、复制redis.conf</span></span><br><span class="line"><span class="built_in">cp</span> /data/redis/redis.conf conf/redis_6379.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改以下内容</span></span><br><span class="line"><span class="comment"># 二、允许远程访问</span></span><br><span class="line"><span class="comment">#1. 注释掉下面代码，或者改为 bind 0.0.0.0</span></span><br><span class="line"><span class="built_in">bind</span> 0.0.0.0</span><br><span class="line"><span class="comment">#2. 关闭保护模式</span></span><br><span class="line">protected-mode no</span><br><span class="line"></span><br><span class="line"><span class="comment"># 二.通用配置</span></span><br><span class="line"><span class="comment">#1. 开启守护进程</span></span><br><span class="line">daemonize <span class="built_in">yes</span></span><br><span class="line"><span class="comment">#2. 配置密码（必须设置相同的密码，不设masterauth的话宕机了不能自动恢复）</span></span><br><span class="line"><span class="comment">#requirepass tdfdsfnkinki.net</span></span><br><span class="line"><span class="comment">#集群节点间的访问密码</span></span><br><span class="line"><span class="comment">#masterauth tdfdsfnkinki.net</span></span><br><span class="line"><span class="comment"># 持久化类型</span></span><br><span class="line">appendonly <span class="built_in">yes</span></span><br><span class="line">appendfilename <span class="string">&quot;appendonly-6379.aof&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 三.集群配置</span></span><br><span class="line">port 7000 <span class="comment">#配置端口</span></span><br><span class="line">cluster-enabled <span class="built_in">yes</span> <span class="comment">#开启集群</span></span><br><span class="line">cluster-config-file nodes-6379.conf  <span class="comment">#集群节点配置文件</span></span><br><span class="line">pidfile /root/data/redis/run/6379.pid <span class="comment">#进程文件ID对应文件</span></span><br><span class="line">cluster-node-timeout 5000 <span class="comment">#集群节点超时时间，超过这个时间，集群认为该节点故障，如果是主节点，会进行相应的主从切换</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 四.配置对应目录</span></span><br><span class="line">logfile /root/data/redis/log/6379.log <span class="comment">#日志文件</span></span><br><span class="line"><span class="built_in">dir</span> /root/data/redis/data/6379 <span class="comment">#目录要提前创建好</span></span><br></pre></td></tr></table></figure></li>
+<li><p>将redis_6379.conf 复制到其它节点做以下修改</p>
+</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 主要是有关端口的，更换为实际端口</span></span><br><span class="line">appendfilename <span class="string">&quot;appendonly-6379.aof&quot;</span></span><br><span class="line">port 6379 </span><br><span class="line">cluster-config-file nodes-6379.conf </span><br><span class="line">pidfile /root/data/redis/run/redis_6379.pid </span><br><span class="line">logfile /root/data/redis/log/redis_6379.log </span><br><span class="line"><span class="built_in">dir</span> /root/data/redis/data/6379 </span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>启动各redis节点</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /data/redis/bin</span><br><span class="line">./redis-server ../conf/redis_6379.conf</span><br><span class="line">./redis-server ../conf/redis_16379.conf</span><br><span class="line"><span class="comment"># 指定各节点配置</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-启动并测试"><a href="#4-3-启动并测试" class="headerlink" title="4.3 启动并测试"></a>4.3 启动并测试</h2><ol>
+<li>配置集群</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在Redis 5.0之后直接利用 redis-cli 完成集群配置</span></span><br><span class="line"><span class="comment">#--cluster-replicas 1 指示给定的创建节点列表是以主节点+从节点对组成的</span></span><br><span class="line"><span class="comment">#主从的对应关系可通过cluster nodes看到</span></span><br><span class="line">./redis-cli  --cluster create 192.168.85.106:6379   192.168.85.107:6380 192.168.85.115:6381  192.168.85.106:26379 192.168.85.107:26380 192.168.85.115:26381 --cluster-replicas 1</span><br><span class="line"></span><br><span class="line"><span class="comment"># cluster 其它操作</span></span><br><span class="line"><span class="comment"># 查看节点信息 </span></span><br><span class="line">cluster nodes</span><br><span class="line"><span class="comment">#节点id: 由40个16进制字符串组成，节点id只在集群初始化时创建一次，然后保存到集群配置文件（即前文提到的cluster-config-file）中，以后节点重新启动时会直接在集群配置文件中读取。</span></span><br><span class="line"><span class="comment">#port@cport: 前者为普通端口，用于为客户端提供服务；后者为集群端口，分配方法为：普通端口+10000，只用于节点间的通讯。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看集群信息</span></span><br><span class="line">cluster info</span><br><span class="line"><span class="comment"># 查看槽位信息</span></span><br><span class="line">cluster slots</span><br><span class="line"><span class="comment"># 计算某个key的槽位</span></span><br><span class="line">cluster keyslot xxx</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>测试集群</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli -p 6379b -c</span><br><span class="line"><span class="comment">#-c 指定是集群模式连接 如果不加-c  如果key不在当前节点槽位会直接报错，不会主动重定向</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>模拟故障</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># shutdown掉6379 看其slave会主动成为master，当6379恢复时会自动成为slave运行</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-4-集群伸缩"><a href="#4-4-集群伸缩" class="headerlink" title="4.4 集群伸缩"></a>4.4 集群伸缩</h2><h3 id="4-4-1-添加节点"><a href="#4-4-1-添加节点" class="headerlink" title="4.4.1 添加节点"></a>4.4.1 添加节点</h3><ol>
+<li>增加两个节点</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>IP</th>
+<th>PORT（主）</th>
+<th>PORT（从）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>192.168.85.115</td>
+<td>8682(18682）</td>
+<td>28682（38682）</td>
+</tr>
+</tbody></table>
+<ol start="2">
+<li>配置节点并启动</li>
+<li>节点握手，借助 redis-cli –cluster add-node 命令分别添加节点8682和28682</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli --cluster add-node 192.168.85.115:8682 192.168.85.106:6379</span><br><span class="line">./redis-cli --cluster add-node 192.168.85.115:28682 192.168.85.106:6379</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>重新分片,借助 redis-cli –cluster reshard 命令对集群重新分片，使得各节点槽位均衡</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 移动的槽位数：最终平均每个主节点有4096个slot，所以每个节点移动</span></span><br><span class="line"><span class="comment"># 接收槽位的目标节点ID：节点6382的ID</span></span><br><span class="line"><span class="comment"># 移出槽位的源节点ID：节点6379/6380/6381的ID</span></span><br><span class="line">./redis-cli --cluster reshard 192.168.85.115:8682</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>设置主从关系</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli -p 28682 cluster replicate f3a55c3544dd6633d3eab7657e25d569afb69ea0 </span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-2-删除节点"><a href="#4-4-2-删除节点" class="headerlink" title="4.4.2 删除节点"></a>4.4.2 删除节点</h3><ul>
+<li>将8682 28682两个节点删除</li>
+</ul>
+<ol>
+<li>重新分片，将8682节点上的槽位全部转移到节点6379上</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli --cluster reshard 192.168.85.106:6379</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>删除节点</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./redis-cli --cluster del-node 192.168.85.115:8682 f3a55c3544dd6633d3eab7657e25d569afb69ea0</span><br><span class="line"></span><br><span class="line">./redis-cli --cluster del-node 192.168.85.115:28682 de555118a46ccedc65cc7f578d243a580d30360f</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>redis</category>
+      </categories>
+      <tags>
+        <tag>linux</tag>
+        <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>sudo配置规则.md</title>
+    <url>/posts/ecad03f9/</url>
+    <content><![CDATA[<h3 id="摘要：sudo的规则配置"><a href="#摘要：sudo的规则配置" class="headerlink" title="摘要：sudo的规则配置"></a>摘要：sudo的规则配置</h3><h3 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h3><table>
 <thead>
 <tr>
 <th align="center">日期</th>
@@ -2245,69 +2370,20 @@
 </tbody></table>
 <span id="more"></span>
 
-<h1 id="prometheus-简单介绍"><a href="#prometheus-简单介绍" class="headerlink" title="prometheus 简单介绍"></a>prometheus 简单介绍</h1><ul>
-<li>官网: <a href="https://prometheus.io/">prometheus.io</a></li>
-</ul>
-<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204191419769.png" alt="普罗米修斯架构"></p>
-<p><strong>Prometheus Server：</strong> 用于收集和存储时间序列化数据</p>
-<p><strong>Exporters：</strong>将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server，Prometheus Server通过访问该Exporter提供的Endpoint端点，即可以获取到需要采集的监控数据</p>
-<p><strong>Pushgateway：</strong>主要是实现接收由 Client push 过来的指标数据，在指定的时间间隔，由主程序来抓取。由于 Prometheus 数据采集基于 Pull 模型进行设计，因此在网络环境的配置上必须要让 Prometheus Server 能够直接与 Exporter 进行通信。当这种网络需求无法直接满足时，就可以利用 PushGateway 来进行中转。可以通过 PushGateway 将内部网络的监控数据主动 Push 到 Gateway 当中。而 Prometheus Server 则可以采用同样 Pull 的方式从 PushGateway 中获取到监控数据</p>
-<p><strong>Altermanager：</strong> 在Prometheus Server中支持基于Prom QL创建告警规则，如果满足Prom QL定义的规则，则会产生一条告警。当AlertManager从 Prometheus server 端接收到 alerts后，会进行去重，分组，并路由到相应的接收方，发出报警。</p>
-<h2 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h2><ol>
-<li>Prometheus server 定期从配置好的 jobs 或者 exporters 中拉取 metrics，或者从Pushgateway 拉取metrics，或者从其他的 Prometheus server 中拉 metrics。</li>
-<li>Prometheus server 在本地存储收集到的 metrics，并运行已定义好的 alert.rules，通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。记录新的时间序列或者向 Alertmanager 推送警报。</li>
-<li>Prometheus通过PromQL和其他API可视化地展示收集的数据。Prometheus支持很多方式的图表可视化，例如Grafana、自带的Promdash以及自身提供的模版引擎等等。Prometheus还提供HTTP API的查询方式，自定义所需要的输出。</li>
-</ol>
-<h1 id="prometheus-安装部署"><a href="#prometheus-安装部署" class="headerlink" title="prometheus 安装部署"></a>prometheus 安装部署</h1><h2 id="二进制包方式安装Prometheus"><a href="#二进制包方式安装Prometheus" class="headerlink" title="二进制包方式安装Prometheus"></a>二进制包方式安装Prometheus</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 创建prometheus用户</span></span><br><span class="line">useradd -M -s /sbin/nologin prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 下载prometheus</span></span><br><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.35.0-rc0/prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 解压</span></span><br><span class="line">tar -zxvf prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 使用systemctl管理进程</span></span><br><span class="line">vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line"><span class="meta">#</span><span class="language-bash">添加以下内容 执行路径根据实际情况填写</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus</span><br><span class="line">Documentation=https://prometheus.io/</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">Environment=&quot;GOMAXPROCS=4&quot;</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStart=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus \</span><br><span class="line">  --config.file=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus.yml \</span><br><span class="line">  --storage.tsdb.path=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64 \</span><br><span class="line">  --storage.tsdb.retention=30d \</span><br><span class="line">  --web.console.libraries=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/console_libraries \</span><br><span class="line">  --web.console.templates=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/consoles \</span><br><span class="line">  --web.listen-address=0.0.0.0:8905 \</span><br><span class="line">  --web.read-timeout=5m \</span><br><span class="line">  --web.max-connections=30 \</span><br><span class="line">  --query.max-concurrency=50 \</span><br><span class="line">  --web.enable-lifecycle #prometheus配置更改后可以进行热加载</span><br><span class="line">  --query.timeout=2m</span><br><span class="line">  </span><br><span class="line">PrivateTmp=true</span><br><span class="line">PrivateDevices=true</span><br><span class="line">ProtectHome=true</span><br><span class="line">NoNewPrivileges=true</span><br><span class="line">LimitNOFILE=infinity</span><br><span class="line">ReadWriteDirectories=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64</span><br><span class="line">ProtectSystem=full</span><br><span class="line"></span><br><span class="line">SyslogIdentifier=prometheus</span><br><span class="line">Restart=always</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 启动</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl start|reload||stop prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.可通过web访问</span></span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置密码"><a href="#配置密码" class="headerlink" title="配置密码"></a>配置密码</h2><ul>
-<li>默认情况下是可以直接访问prometheus的web UI的，这样是很不安全的，是可以配置TLS+密码验证的，这里只配置密码验证了。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash"> 1.安装httpd-tools</span></span><br><span class="line">yum install -y httpd-tools</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"> 2.生成密码</span></span><br><span class="line">htpasswd -nBC 10 &quot;&quot; | tr -d &#x27;:\n&#x27;   # 回车后输入密码  例如输入6个1</span><br><span class="line"><span class="meta">$</span><span class="language-bash">2y$10<span class="variable">$SpFQBSWkvNboPXm</span>/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.node_exporter安装目录下编辑web-config.yml文件</span></span><br><span class="line">basic_auth_users:</span><br><span class="line"><span class="meta">  # </span><span class="language-bash">用户名: 密码-上面加密生产的字符串</span> </span><br><span class="line">  mynode: $2y$10$SpFQBSWkvNboPXm/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span><br><span class="line"><span class="meta"># </span><span class="language-bash">启动node_exporter中加上以下配置 /usr/lib/systemd/system/prometheus.service</span></span><br><span class="line">--web.config.file=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/web-config.yml</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. reload</span></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl restart prometheus</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置prometheus-yml"><a href="#配置prometheus-yml" class="headerlink" title="配置prometheus.yml"></a>配置prometheus.yml</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">在prometheus安装目录中，配置prometheus.yml,增加basic_auth项</span></span><br><span class="line">basic_auth</span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &quot;prometheus&quot;</span><br><span class="line">    basic_auth</span><br><span class="line">basic_auth:</span><br><span class="line">      username: xxx</span><br><span class="line">      password: xxx</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&quot;localhost:8905&quot;]</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">reload prometheus</span></span><br><span class="line">systemctl reload prometheus</span><br></pre></td></tr></table></figure>
-
-<h1 id="node-exporter安装配置"><a href="#node-exporter安装配置" class="headerlink" title="node_exporter安装配置"></a>node_exporter安装配置</h1><h2 id="二进制包方式安装node-exporter"><a href="#二进制包方式安装node-exporter" class="headerlink" title="二进制包方式安装node_exporter"></a>二进制包方式安装node_exporter</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载，解压</span></span><br><span class="line">wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf  node_exporter-1.3.1.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 修改默认端口，在启动参数中加以下配置</span></span><br><span class="line">--web.listen-address=:8009</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 启动方式</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 前台启动</span></span></span><br><span class="line">node_exporter </span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 后台启动方式1</span></span></span><br><span class="line">node_exporter &amp;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 后台启动方式2</span></span></span><br><span class="line">nohup node_exporter &amp;&gt; /var/log/node_exporter.log &amp;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># 带参数后台启动</span></span></span><br><span class="line">nohup node_exporter  --web.listen-address=0.0.0.0:8009  --web.telemetry-path=/metrics \ </span><br><span class="line">&amp;&gt; /var/log/node_exporter/node_exporter.log &amp;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4.使用systemctl管理 新建node_exporter.service</span></span><br><span class="line">vim  /usr/lib/systemd/system/node_exporter.service</span><br><span class="line"><span class="meta"># </span><span class="language-bash">添加以下内容 路径和端口根据实际情况配置</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Node_exporter</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecStart=/data/app/prometheus/node_exporter-1.3.1.linux-amd64/node_exporter \</span><br><span class="line">  --web.listen-address=0.0.0.0:8009 \</span><br><span class="line">  --web.telemetry-path=/metrics \</span><br><span class="line">  --log.level=info \</span><br><span class="line">  --log.format=logfmt</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -KILL $MAINPID</span><br><span class="line">Type=simple</span><br><span class="line">KillMode=control-group</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=15s</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5.启动</span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">重载配置文件</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line"><span class="meta">#</span><span class="language-bash">启动node_exporter</span></span><br><span class="line">systemctl start node_exporter</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.在web中可以直接看到Metrics数据</span></span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置密码-1"><a href="#配置密码-1" class="headerlink" title="配置密码"></a>配置密码</h2><ul>
-<li><p>由于node_exporter是prometheus server 通过pull方式拉取数据，这就导致端口是对外开放的，考虑安全性，需要加上密码验证</p>
-</li>
-<li><p><a href="https://github.com/prometheus/exporter-toolkit/blob/v0.1.0/https/README.md">参考</a></p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1.生成密码</span></span><br><span class="line">htpasswd -nBC 10 &quot;&quot; | tr -d &#x27;:\n&#x27;   # 回车后输入密码  例如输入6个1</span><br><span class="line"><span class="meta">$</span><span class="language-bash">2y$10<span class="variable">$SpFQBSWkvNboPXm</span>/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2.node_exporter安装目录下编辑web-config.yml文件</span></span><br><span class="line">basic_auth_users:</span><br><span class="line"><span class="meta">  # </span><span class="language-bash">用户名: 密码-上面加密生产的字符串</span> </span><br><span class="line">  mynode: $2y$10$SpFQBSWkvNboPXm/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span><br><span class="line"><span class="meta"># </span><span class="language-bash">启动node_exporter中加上以下配置 /usr/lib/systemd/system/node_exporter.service</span></span><br><span class="line">--web.config=/data/app/prometheus/node_exporter-1.3.1.linux-amd64/web-config.yml </span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. reload</span></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl restart node_exporter</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置prometheus-yml-1"><a href="#配置prometheus-yml-1" class="headerlink" title="配置prometheus.yml"></a>配置prometheus.yml</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在prometheus安装目录中，配置prometheus.yml中下面增加如下配置</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&#x27;nodes&#x27;</span></span><br><span class="line">    <span class="attr">basic_auth:</span> <span class="comment">#如果node_exporter中配置的用户密码增加此选项</span></span><br><span class="line">      <span class="attr">username:</span> <span class="string">xxx</span></span><br><span class="line">      <span class="attr">password:</span> <span class="string">xxx</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&#x27;127.0.0.1:8906&#x27;</span>,<span class="string">&#x27;127.0.0.1:8009&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># reload prometheus</span></span><br><span class="line"><span class="string">systemctl</span> <span class="string">reload</span> <span class="string">prometheus</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="安装Grafana，配置promrtheus数据源"><a href="#安装Grafana，配置promrtheus数据源" class="headerlink" title="安装Grafana，配置promrtheus数据源"></a>安装Grafana，配置promrtheus数据源</h1><ul>
-<li>官网：<a href="https://grafana.com/grafana/download">Grafana</a></li>
-<li>模板:   <a href="https://grafana.com/grafana/dashboards">dashboards</a></li>
-</ul>
-<h2 id="下载安装Grafana"><a href="#下载安装Grafana" class="headerlink" title="下载安装Grafana"></a>下载安装Grafana</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载安装grafana</span></span><br><span class="line">wget https://dl.grafana.com/enterprise/release/grafana-enterprise-8.4.6-1.x86_64.rpm</span><br><span class="line">sudo yum install grafana-enterprise-8.4.6-1.x86_64.rpm</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 启动grafana</span></span><br><span class="line">systemctl start grafana-server</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.grafana默认端口是3000，如果需要修改默认端口，进入grafana配置文件路径，修改配置文件</span></span><br><span class="line">vim /etc/grafana/grafana.ini</span><br><span class="line"><span class="meta"># </span><span class="language-bash">修改http_port端口</span></span><br><span class="line">http_port = 8907</span><br><span class="line"><span class="meta"># </span><span class="language-bash">reload或restart grafana-server</span></span><br><span class="line">systemctl restart grafana-server</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置prometheus源"><a href="#配置prometheus源" class="headerlink" title="配置prometheus源"></a>配置prometheus源</h2><ul>
-<li>配置数据源Data sources-&gt;Add data source -&gt; Prometheus，输入prometheus数据源的信息，主要是输入name和url</li>
-</ul>
-<p><img src="https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204191750576.png" alt="image-20220419174959969"></p>
-<img src="D:/workspace/typora_pic/image-20220419175035715.png" alt="image-20220419175035715" style="zoom:50%;" />
-
-<img src="D:/workspace/typora_pic/image-20220419175114474.png" alt="image-20220419175114474" style="zoom:50%;" />
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">用户sudo授权：</span><br><span class="line">visudo</span><br><span class="line"><span class="comment">## Allow root to run any commands anywhere</span></span><br><span class="line">root    ALL=(ALL)       ALL</span><br><span class="line">user    ALL=(root)      NOPASSWD:ALL,!/sbin/shutdown,!/sbin/init,!/bin/<span class="built_in">rm</span> <span class="literal">-rf</span> /</span><br><span class="line"></span><br><span class="line">解释说明：</span><br><span class="line"><span class="number">1</span>）第一个字段user指定的是用户：可以是用户名，也可以是别名。每个用户设置一行，多个用户设置多行，也可以将多个用户设置成一个别名后再进行设置。</span><br><span class="line"><span class="number">2</span>）第二个字段ALL指定的是用户所在的主机：可以是ip,也可以是主机名，表示该sudo设置只在该主机上生效，ALL表示在所有主机上都生效！限制的一般都是本机，也就是限制使用这个文件的主机;一般都指定为<span class="string">&quot;ALL&quot;</span>表示所有的主机，不管文件拷到那里都可以用。比如：<span class="number">10.1</span>.<span class="number">1.1</span>=...则表示只在当前主机生效。</span><br><span class="line"><span class="number">3</span>）第三个字段（root）括号里指定的也是用户：指定以什么用户身份执行sudo，即使用sudo后可以享有所有root账号下的权限。如果要排除个别用户，可以在括号内设置，比如ALL=(ALL,!oracle,!pos)。</span><br><span class="line"><span class="number">4</span>）第四个字段ALL指定的是执行的命令：即使用sudo后可以执行所有的命令。除了关机和删除根内容以外；也可以设置别名。NOPASSWD: ALL表示使用sudo的不需要输入密码。</span><br><span class="line"><span class="number">5</span>）也可以授权给一个用户组</span><br><span class="line">	%admin ALL=(ALL) ALL	表示admin组里的所有成员可以在任何主机上以任何用户身份执行任何命令</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>参考连接</li>
-<li><a href="https://zhuanlan.zhihu.com/p/434353542">https://zhuanlan.zhihu.com/p/434353542</a></li>
-<li><a href="https://blog.51cto.com/u_12082223/3241875">https://blog.51cto.com/u_12082223/3241875</a></li>
-<li><a href="http://www.yunweipai.com/34713.html">http://www.yunweipai.com/34713.html</a></li>
-<li><a href="https://www.modb.pro/db/45956">https://www.modb.pro/db/45956</a></li>
+<li><a href="https://juejin.cn/post/6992609027234463758">Linux sudo和sudoers详解！</a></li>
+<li><a href="https://www.sogou.com/link?url=hedJjaC291OSi_i_Ca0srR5OmlBS3kcCytWslkz0jklZeKmuPWg0fw..">sudo配置文件详解</a></li>
 </ul>
 ]]></content>
       <categories>
-        <category>Prometheus</category>
+        <category>shell</category>
       </categories>
       <tags>
         <tag>centos</tag>
-        <tag>Prometheus</tag>
-        <tag>Grafana</tag>
+        <tag>shell</tag>
       </tags>
   </entry>
 </search>

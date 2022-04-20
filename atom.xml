@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-04-20T02:56:06.860Z</updated>
+  <updated>2022-04-20T03:29:54.688Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -17,11 +17,49 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>centos中使用odbc配置mysql或mariadb</title>
+    <link href="https://ziveni.github.io/posts/81ac0233/"/>
+    <id>https://ziveni.github.io/posts/81ac0233/</id>
+    <published>2022-04-20T02:58:18.000Z</published>
+    <updated>2022-04-20T03:29:54.688Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;摘要：centos中使用odbc配置mysql或mariadb&lt;/p&gt;
+&lt;p&gt;更新内容&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="odbc" scheme="https://ziveni.github.io/categories/odbc/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="mariadb" scheme="https://ziveni.github.io/tags/mariadb/"/>
+    
+    <category term="mysql" scheme="https://ziveni.github.io/tags/mysql/"/>
+    
+    <category term="odbc" scheme="https://ziveni.github.io/tags/odbc/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Prometheus+Grafana部署系统监控</title>
     <link href="https://ziveni.github.io/posts/2047dd97/"/>
     <id>https://ziveni.github.io/posts/2047dd97/</id>
     <published>2022-04-18T02:56:51.000Z</published>
-    <updated>2022-04-20T02:56:06.860Z</updated>
+    <updated>2022-04-20T03:03:00.148Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：Prometheus-Grafana部署系统监控&quot;&gt;&lt;a href=&quot;#摘要：Prometheus-Grafana部署系统监控&quot; class=&quot;headerlink&quot; title=&quot;摘要：Prometheus+Grafana部署系统监控&quot;&gt;&lt;/a&gt;摘要：Prometheus+Grafana部署系统监控&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
