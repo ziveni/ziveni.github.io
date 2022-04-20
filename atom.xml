@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-04-15T01:43:41.342Z</updated>
+  <updated>2022-04-20T02:56:06.860Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -15,6 +15,40 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Prometheus+Grafana部署系统监控</title>
+    <link href="https://ziveni.github.io/posts/2047dd97/"/>
+    <id>https://ziveni.github.io/posts/2047dd97/</id>
+    <published>2022-04-18T02:56:51.000Z</published>
+    <updated>2022-04-20T02:56:06.860Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;摘要：Prometheus-Grafana部署系统监控&quot;&gt;&lt;a href=&quot;#摘要：Prometheus-Grafana部署系统监控&quot; class=&quot;headerlink&quot; title=&quot;摘要：Prometheus+Grafana部署系统监控&quot;&gt;&lt;/a&gt;摘要：Prometheus+Grafana部署系统监控&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="Prometheus" scheme="https://ziveni.github.io/categories/Prometheus/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="Prometheus" scheme="https://ziveni.github.io/tags/Prometheus/"/>
+    
+    <category term="Grafana" scheme="https://ziveni.github.io/tags/Grafana/"/>
+    
+  </entry>
   
   <entry>
     <title>sudo配置规则.md</title>
@@ -45,25 +79,6 @@
     <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
     
     <category term="shell" scheme="https://ziveni.github.io/tags/shell/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>zabbix操作指南</title>
-    <link href="https://ziveni.github.io/posts/a39de4c0/"/>
-    <id>https://ziveni.github.io/posts/a39de4c0/</id>
-    <published>2022-04-01T09:32:29.000Z</published>
-    <updated>2022-04-01T09:33:19.846Z</updated>
-    
-    
-    
-    
-    <category term="zabbix" scheme="https://ziveni.github.io/categories/zabbix/"/>
-    
-    
-    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
-    
-    <category term="zabbix" scheme="https://ziveni.github.io/tags/zabbix/"/>
     
   </entry>
   
@@ -103,25 +118,6 @@
   </entry>
   
   <entry>
-    <title>Ansible学习笔记</title>
-    <link href="https://ziveni.github.io/posts/45ad51da/"/>
-    <id>https://ziveni.github.io/posts/45ad51da/</id>
-    <published>2022-02-18T06:55:09.000Z</published>
-    <updated>2022-02-18T08:55:43.930Z</updated>
-    
-    
-    
-    
-    <category term="Ansible" scheme="https://ziveni.github.io/categories/Ansible/"/>
-    
-    
-    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
-    
-    <category term="Ansible" scheme="https://ziveni.github.io/tags/Ansible/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Docker学习笔记</title>
     <link href="https://ziveni.github.io/posts/4a3d459a/"/>
     <id>https://ziveni.github.io/posts/4a3d459a/</id>
@@ -147,8 +143,6 @@
     <category term="docker" scheme="https://ziveni.github.io/categories/docker/"/>
     
     
-    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
-    
     <category term="docker" scheme="https://ziveni.github.io/tags/docker/"/>
     
     <category term="Harbor" scheme="https://ziveni.github.io/tags/Harbor/"/>
@@ -156,6 +150,8 @@
     <category term="register" scheme="https://ziveni.github.io/tags/register/"/>
     
     <category term="rancher" scheme="https://ziveni.github.io/tags/rancher/"/>
+    
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
     
   </entry>
   
@@ -262,7 +258,7 @@
     <link href="https://ziveni.github.io/posts/31ae148b/"/>
     <id>https://ziveni.github.io/posts/31ae148b/</id>
     <published>2022-02-18T01:28:09.000Z</published>
-    <updated>2022-04-01T09:48:07.829Z</updated>
+    <updated>2022-04-20T02:56:04.143Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：nginx-在linux（centos），windows下的安装步骤&quot;&gt;&lt;a href=&quot;#摘要：nginx-在linux（centos），windows下的安装步骤&quot; class=&quot;headerlink&quot; title=&quot;摘要：nginx 在linux（centos），windows下的安装步骤&quot;&gt;&lt;/a&gt;摘要：nginx 在linux（centos），windows下的安装步骤&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
@@ -275,6 +271,10 @@
 &lt;tbody&gt;&lt;tr&gt;
 &lt;td align=&quot;center&quot;&gt;2022-02&lt;/td&gt;
 &lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04-20&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;增加centos下nginx yum的安装方式&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;&lt;/table&gt;</summary>
     
