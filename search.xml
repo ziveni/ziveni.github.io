@@ -865,7 +865,7 @@
 <li>Prometheus server 在本地存储收集到的 metrics，并运行已定义好的 alert.rules，通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。记录新的时间序列或者向 Alertmanager 推送警报。</li>
 <li>Prometheus通过PromQL和其他API可视化地展示收集的数据。Prometheus支持很多方式的图表可视化，例如Grafana、自带的Promdash以及自身提供的模版引擎等等。Prometheus还提供HTTP API的查询方式，自定义所需要的输出。</li>
 </ol>
-<h1 id="prometheus-安装部署"><a href="#prometheus-安装部署" class="headerlink" title="prometheus 安装部署"></a>prometheus 安装部署</h1><h2 id="二进制包方式安装Prometheus"><a href="#二进制包方式安装Prometheus" class="headerlink" title="二进制包方式安装Prometheus"></a>二进制包方式安装Prometheus</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 创建prometheus用户</span></span><br><span class="line">useradd -M -s /sbin/nologin prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 下载prometheus</span></span><br><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.35.0-rc0/prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 解压</span></span><br><span class="line">tar -zxvf prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 使用systemctl管理进程</span></span><br><span class="line">vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line"><span class="meta">#</span><span class="language-bash">添加以下内容 执行路径根据实际情况填写</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus</span><br><span class="line">Documentation=https://prometheus.io/</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">Environment=&quot;GOMAXPROCS=4&quot;</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStart=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus \</span><br><span class="line">  --config.file=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus.yml \</span><br><span class="line">  --storage.tsdb.path=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64 \</span><br><span class="line">  --storage.tsdb.retention=30d \</span><br><span class="line">  --web.console.libraries=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/console_libraries \</span><br><span class="line">  --web.console.templates=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/consoles \</span><br><span class="line">  --web.listen-address=0.0.0.0:8905 \</span><br><span class="line">  --web.read-timeout=5m \</span><br><span class="line">  --web.max-connections=30 \</span><br><span class="line">  --query.max-concurrency=50 \</span><br><span class="line">  --web.enable-lifecycle #prometheus配置更改后可以进行热加载</span><br><span class="line">  --query.timeout=2m</span><br><span class="line">  </span><br><span class="line">PrivateTmp=true</span><br><span class="line">PrivateDevices=true</span><br><span class="line">ProtectHome=true</span><br><span class="line">NoNewPrivileges=true</span><br><span class="line">LimitNOFILE=infinity</span><br><span class="line">ReadWriteDirectories=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64</span><br><span class="line">ProtectSystem=full</span><br><span class="line"></span><br><span class="line">SyslogIdentifier=prometheus</span><br><span class="line">Restart=always</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 启动</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl start|reload||stop prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.可通过web访问</span></span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
+<h1 id="prometheus-安装部署"><a href="#prometheus-安装部署" class="headerlink" title="prometheus 安装部署"></a>prometheus 安装部署</h1><h2 id="二进制包方式安装Prometheus"><a href="#二进制包方式安装Prometheus" class="headerlink" title="二进制包方式安装Prometheus"></a>二进制包方式安装Prometheus</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 创建Prometheus组和用户</span></span><br><span class="line">sudo groupadd -r prometheus </span><br><span class="line">sudo useradd -r -g prometheus -s /sbin/nologin -M -c &quot;prometheus Daemons&quot; prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 下载prometheus</span></span><br><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.35.0-rc0/prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 解压</span></span><br><span class="line">tar -zxvf prometheus-2.35.0-rc0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 使用systemctl管理进程</span></span><br><span class="line">vim /usr/lib/systemd/system/prometheus.service</span><br><span class="line"><span class="meta">#</span><span class="language-bash">添加以下内容 执行路径根据实际情况填写</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus</span><br><span class="line">Documentation=https://prometheus.io/</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">Environment=&quot;GOMAXPROCS=4&quot;</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStart=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus \</span><br><span class="line">  --config.file=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/prometheus.yml \</span><br><span class="line">  --storage.tsdb.path=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/data \</span><br><span class="line">  --storage.tsdb.retention=30d \</span><br><span class="line">  --web.console.libraries=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/console_libraries \</span><br><span class="line">  --web.console.templates=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64/consoles \</span><br><span class="line">  --web.listen-address=0.0.0.0:8905 \</span><br><span class="line">  --web.read-timeout=5m \</span><br><span class="line">  --web.max-connections=30 \</span><br><span class="line">  --query.max-concurrency=50 \</span><br><span class="line">  --web.enable-lifecycle #prometheus配置更改后可以进行热加载</span><br><span class="line">  --query.timeout=2m</span><br><span class="line">  </span><br><span class="line">PrivateTmp=true</span><br><span class="line">PrivateDevices=true</span><br><span class="line">ProtectHome=true</span><br><span class="line">NoNewPrivileges=true</span><br><span class="line">LimitNOFILE=infinity</span><br><span class="line">ReadWriteDirectories=/data/app/prometheus/prometheus-2.35.0-rc0.linux-amd64</span><br><span class="line">ProtectSystem=full</span><br><span class="line"></span><br><span class="line">SyslogIdentifier=prometheus</span><br><span class="line">Restart=always</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 启动</span></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl start|reload||stop prometheus</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.可通过web访问</span></span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
 
 <h2 id="配置密码"><a href="#配置密码" class="headerlink" title="配置密码"></a>配置密码</h2><ul>
 <li>默认情况下是可以直接访问prometheus的web UI的，这样是很不安全的，是可以配置TLS+密码验证的，这里只配置密码验证了。</li>
@@ -906,6 +906,7 @@
 <li><a href="https://blog.51cto.com/u_12082223/3241875">https://blog.51cto.com/u_12082223/3241875</a></li>
 <li><a href="http://www.yunweipai.com/34713.html">http://www.yunweipai.com/34713.html</a></li>
 <li><a href="https://www.modb.pro/db/45956">https://www.modb.pro/db/45956</a></li>
+<li><a href="https://blog.51cto.com/u_15072918/3625574#219-alertmanager_config">https://blog.51cto.com/u_15072918/3625574#219-alertmanager_config</a></li>
 </ul>
 ]]></content>
       <categories>
@@ -2075,6 +2076,31 @@
 <h2 id="2-编译"><a href="#2-编译" class="headerlink" title="2. 编译"></a>2. 编译</h2><ul>
 <li><p>安装到/data/redis里，方便管理</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 进入到源码包里</span></span><br><span class="line"><span class="built_in">cd</span> /data/redis</span><br><span class="line"><span class="comment"># 2. 编译并安装 PREFIX=指定程序存放的路径</span></span><br><span class="line">make &amp;&amp; make PREFIX=/data/redis install</span><br></pre></td></tr></table></figure></li>
+<li><p>常见错误</p>
+<ol>
+<li><code>/bin/sh: cc: command not found</code></li>
+</ol>
+<ul>
+<li>原因：没有安装gcc  </li>
+<li>解决办法: <code>yum install -y gcc </code></li>
+</ul>
+<ol start="2">
+<li><code>fatal error: jemalloc/jemalloc.h: No such file or directory</code></li>
+</ol>
+<p><img src="D:/workspace/typora_pic/image-20220526112532529.png" alt="image-20220526112532529"></p>
+<ul>
+<li><a href="https://www.cnblogs.com/EikiXu/p/9412645.html">原因</a>：Selecting a non-default memory allocator</li>
+<li>解决办法：cd src  <code>make MALLOC=libc</code></li>
+</ul>
+<ol start="3">
+<li><p><code>cc: error: ../deps/hiredis/libhiredis.a: No such file or directory cc: error: ../deps/lua/src/liblua.a: No such file or directory</code></p>
+<ul>
+<li><p>解决办法</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 到redis源码包的deps里</span></span><br><span class="line">make lua hiredis linenoise</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+</li>
 </ul>
 <h2 id="3-修改配置文件"><a href="#3-修改配置文件" class="headerlink" title="3. 修改配置文件"></a>3. 修改配置文件</h2><ul>
 <li>不建议使用<code>utils/install_server.sh</code>进行配置</li>
@@ -2389,9 +2415,9 @@
       </tags>
   </entry>
   <entry>
-    <title>Prometheus之Altermanager</title>
+    <title>Prometheus之Alertmanager</title>
     <url>/posts/be093ac/</url>
-    <content><![CDATA[<p>摘要：Prometheus之Altermanager安装配置</p>
+    <content><![CDATA[<p>摘要：Prometheus之Alertmanager安装配置</p>
 <p>更新内容</p>
 <table>
 <thead>
@@ -2407,15 +2433,33 @@
 </tbody></table>
 <span id="more"></span>
 
+<h1 id="Alertmanager"><a href="#Alertmanager" class="headerlink" title="Alertmanager"></a>Alertmanager</h1><ul>
+<li>Alertmanager 处理由 Prometheus 服务器等客户端应用程序发送的警报。 它负责对它们进行重复数据删除、分组并将它们路由到正确的接收器集成，例如电子邮件、PagerDuty 或 OpsGenie。 它还负责警报的<code>silencing</code> 和<code>inhibition</code>.</li>
+</ul>
+<h1 id="二进制方式下载安装alertmanager"><a href="#二进制方式下载安装alertmanager" class="headerlink" title="二进制方式下载安装alertmanager"></a>二进制方式下载安装alertmanager</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载解压</span></span><br><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf alertmanager-0.24.0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 配置web ui用户验证</span></span><br><span class="line">htpasswd -nBC 10 &quot;&quot; | tr -d &#x27;:\n&#x27;   # 回车后输入密码</span><br><span class="line"><span class="meta">$</span><span class="language-bash">2y$10<span class="variable">$SpFQBSWkvNboPXm</span>/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.安装目录下编辑web-config.yml文件</span></span><br><span class="line">basic_auth_users:</span><br><span class="line"><span class="meta">  # </span><span class="language-bash">用户名: 密码-上面加密生产的字符串</span> </span><br><span class="line">  mynode: $2y$10$SpFQBSWkvNboPXm/YaxwZOUo1WDi86QGSpf1ZfXJHyZmrK9RVWXX6</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 配置系统管理 vim /usr/lib/systemd/system/alertmanager.service</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=root</span><br><span class="line">ExecStart=/data/app/prometheus/alertmanager-0.24.0.linux-amd64/alertmanager  \</span><br><span class="line">  --web.listen-address=:8908 \</span><br><span class="line">  --config.file=/data/app/prometheus/alertmanager-0.24.0.linux-amd64/alertmanager.yml  \</span><br><span class="line">  --web.config.file=/data/app/prometheus/alertmanager-0.24.0.linux-amd64/web-config.yml \</span><br><span class="line">  --cluster.listen-address=  # 这里是关闭了集群模式</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID  #reload不好用</span><br><span class="line">ExecStop=/bin/kill -KILL $MAINPID</span><br><span class="line">Type=simple</span><br><span class="line">KillMode=control-group</span><br><span class="line">Restart=on-failure</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5.启动并设置自动启动</span></span><br><span class="line">systemctl start alertmanager &amp;&amp; systemctl enable alertmanager</span><br></pre></td></tr></table></figure>
 
+<h1 id="配置钉钉机器人通知"><a href="#配置钉钉机器人通知" class="headerlink" title="配置钉钉机器人通知"></a>配置钉钉机器人通知</h1><h2 id="下载安装prometheus-webhook-dingtalk"><a href="#下载安装prometheus-webhook-dingtalk" class="headerlink" title="下载安装prometheus-webhook-dingtalk"></a>下载安装prometheus-webhook-dingtalk</h2><ul>
+<li><a href="https://github.com/timonwong/prometheus-webhook-dingtalk">https://github.com/timonwong/prometheus-webhook-dingtalk</a></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载解压</span></span><br><span class="line">wget https://github.com/timonwong/prometheus-webhook-dingtalk/releases/download/v2.1.0/prometheus-webhook-dingtalk-2.1.0.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf prometheus-webhook-dingtalk-2.1.0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 配置webhook，将安装目录的config.template.yml 复制或重命名为config.yml</span></span><br><span class="line">targets:</span><br><span class="line">  webhook1: #钉钉需要的webhook和secret怎么获取这里就不写了</span><br><span class="line">    url: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxx</span><br><span class="line">    # secret for signature</span><br><span class="line">    secret: SEC000000000000000000000</span><br><span class="line">  webhook2:</span><br><span class="line">    url: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxx</span><br><span class="line">  webhook_legacy:</span><br><span class="line">    url: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxx</span><br><span class="line">    # Customize template content</span><br><span class="line">    message:</span><br><span class="line">      # Use legacy template</span><br><span class="line">      title: &#x27;&#123;&#123; template &quot;legacy.title&quot; . &#125;&#125;&#x27;</span><br><span class="line">      text: &#x27;&#123;&#123; template &quot;legacy.content&quot; . &#125;&#125;&#x27;</span><br><span class="line">  webhook_mention_all:</span><br><span class="line">    url: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxx</span><br><span class="line">    mention:</span><br><span class="line">      all: true</span><br><span class="line">  webhook_mention_users:</span><br><span class="line">    url: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxx</span><br><span class="line">    mention:</span><br><span class="line">      mobiles: [&#x27;156xxxx8827&#x27;, &#x27;189xxxx8325&#x27;]</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.配置系统管理  vim /usr/lib/systemd/system/prometheus-webhook-dingtalk.service</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=prometheus-webhook-dingtalk</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=prometheus</span><br><span class="line">Group=prometheus</span><br><span class="line">ExecStart=/data/app/prometheus/prometheus-webhook-dingtalk-2.0.0.linux-amd64/prometheus-webhook-dingtalk \</span><br><span class="line">  --config.file=/data/app/prometheus/prometheus-webhook-dingtalk-2.0.0.linux-amd64/config.yml \</span><br><span class="line">  --web.listen-address=:8909 \</span><br><span class="line">  --web.enable-lifecycle \</span><br><span class="line">  --log.level=info \</span><br><span class="line">  --log.format=logfmt</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">ExecStop=/bin/kill -KILL $MAINPID</span><br><span class="line">Type=simple</span><br><span class="line">KillMode=control-group</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=15s</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5.启动并设置自动启动</span></span><br><span class="line">systemctl start prometheus-webhook-dingtalk &amp;&amp; systemctl enable prometheus-webhook-dingtalk</span><br></pre></td></tr></table></figure>
 
+<h2 id="配置alertmanager-yml"><a href="#配置alertmanager-yml" class="headerlink" title="配置alertmanager.yml"></a>配置alertmanager.yml</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 配置alertmanager，增加web.hook配置</span></span><br><span class="line">global:</span><br><span class="line">  resolve_timeout: 5m</span><br><span class="line">route:</span><br><span class="line">  group_by: [&#x27;alertname&#x27;]</span><br><span class="line">  group_wait: 5s</span><br><span class="line">  group_interval: 5s</span><br><span class="line">  repeat_interval: 5m</span><br><span class="line">  receiver: &#x27;web.hook&#x27;</span><br><span class="line">receivers:</span><br><span class="line">- name: &#x27;web.hook&#x27;</span><br><span class="line">  webhook_configs:</span><br><span class="line">  - url: &#x27;http://localhost:8060/dingtalk/webhook1/send&#x27; #这里就比较坑了 一定要加后缀路由</span><br><span class="line">    send_resolved: true</span><br><span class="line">inhibit_rules:</span><br><span class="line">  - source_match:</span><br><span class="line">      severity: &#x27;critical&#x27;</span><br><span class="line">    target_match:</span><br><span class="line">      severity: &#x27;warning&#x27;</span><br><span class="line">    equal: [&#x27;alertname&#x27;, &#x27;dev&#x27;, &#x27;instance&#x27;]</span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 配置后重启alertmanager</span></span><br><span class="line">systemctl restart alertmanager</span><br></pre></td></tr></table></figure>
 
+<h2 id="配置prometheus-yml"><a href="#配置prometheus-yml" class="headerlink" title="配置prometheus.yml"></a>配置prometheus.yml</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">在prometheus中配置告警规则</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">    - scheme: http</span><br><span class="line">      basic_auth:</span><br><span class="line">        username: xxx</span><br><span class="line">        password: &#x27;#&#123;Singlee8848.&#125;#&#x27;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets:</span><br><span class="line">        - &#x27;127.0.0.1:8908&#x27;</span><br><span class="line">        </span><br><span class="line">rule_files:</span><br><span class="line">  - &quot;job/first_rules.yml&quot;</span><br></pre></td></tr></table></figure>
 
-
-
+<h1 id="通知测试"><a href="#通知测试" class="headerlink" title="通知测试"></a>通知测试</h1><h3 id="CPU测试"><a href="#CPU测试" class="headerlink" title="CPU测试"></a><strong>CPU测试</strong></h3><p>说明：下载stress软件，如果你Linux系统总的CPU线程有1个，那么设置测试的CPU一定要超过这个值。一般设置为2-3倍。</p>
+<p>命令： stress –cpu 3 –timeout 6000</p>
+<h3 id="内存测试"><a href="#内存测试" class="headerlink" title="内存测试"></a>内存测试</h3><p>说明：下载memtester软件，根据你实际的内存量设置合适的内存测试值，如你的主机有10G，那么按照设置告警的规则为90才告警，你可以设置测试内存为9.5G。测试单位有B K M G自选。</p>
+<p>命令：memtester 900M</p>
+<h3 id="磁盘测试"><a href="#磁盘测试" class="headerlink" title="磁盘测试"></a>磁盘测试</h3><p>说明：实验新挂一张小盘，使用dd命令创建一个大文件，文件一定要占用新盘的95%以上的存储空间。</p>
+<p>命令：dd if=/dev/zero of=/tester/test11 bs=1024K count=1900</p>
+<h3 id="主机up-down测试"><a href="#主机up-down测试" class="headerlink" title="主机up/down测试"></a>主机up/down测试</h3><p>说明：直接对一个监控节点进行关机操作，但是有一个问题prometheus监控是通过客户端的9100端口监控数据，一旦9100端口不通也会触发节点down告警。</p>
+<p>命令：halt -p</p>
 <ul>
 <li>参考连接</li>
 <li><a href="https://www.modb.pro/db/45956">https://www.modb.pro/db/45956</a></li>
+<li><a href="https://blog.51cto.com/mageedu/2568334">https://blog.51cto.com/mageedu/2568334</a></li>
+<li><a href="https://blog.51cto.com/u_15111052/3101859">https://blog.51cto.com/u_15111052/3101859</a></li>
 </ul>
 ]]></content>
       <categories>
@@ -2423,17 +2467,124 @@
       </categories>
       <tags>
         <tag>Prometheus</tag>
-        <tag>Altermanager</tag>
+        <tag>Alertmanager</tag>
       </tags>
   </entry>
   <entry>
     <title>Prometheus之mysqld_exporter</title>
     <url>/posts/60592cec/</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<p>摘要：Prometheus之mysqld_exporter安装配置</p>
+<p>更新内容</p>
+<table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载解压</span></span><br><span class="line">wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.14.0/mysqld_exporter-0.14.0.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf mysqld_exporter-0.14.0.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 创建数据库用户，用来获取指标数据</span></span><br><span class="line">CREATE USER &#x27;mysqld_exporter&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;11234&#x27; WITH MAX_USER_CONNECTIONS 3;</span><br><span class="line">GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO &#x27;mysqld_exporter&#x27;@&#x27;localhost&#x27;;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.配置数据库信息</span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.1 可以配置用户环境变量中</span></span><br><span class="line">export DATA_SOURCE_NAME=&#x27;user:password@(hostname:3306)/&#x27;</span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.2 创建.my.cnf配置文件，默认是~/.my.cnf,也可以指定--config.my-cnf，这里我们在配置目录下创建.my.cnf</span></span><br><span class="line">[client]</span><br><span class="line">host=localhost</span><br><span class="line">port=3306</span><br><span class="line">user=mysqld_exporter</span><br><span class="line">password=11234</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. 为mysqld_exporter web ui配置用户认证</span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4.1使用以下命令生成密码</span></span><br><span class="line">htpasswd -nBC 10 &quot;&quot; | tr -d &#x27;:\n&#x27;</span><br><span class="line"><span class="meta"># </span><span class="language-bash">4.2 创建web-config.yml</span></span><br><span class="line">basic_auth_users:</span><br><span class="line">  alice: $2y$10$ap7hRpj5scT94qeUsRqQzOW35xoZPM6ylyBtAa9..QvffZ1zZWv6e</span><br><span class="line"><span class="meta">  </span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 配置系统启动</span></span><br><span class="line">vim /usr/lib/systemd/system/mysqld_exporter.service</span><br><span class="line"></span><br><span class="line">[Unit]</span><br><span class="line">Description=mysqld_exporter</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/data/app/prometheus/mysqld_exporter-0.14.0.linux-amd64/mysqld_exporter \</span><br><span class="line">  --config.my-cnf=/data/app/prometheus/mysqld_exporter-0.14.0.linux-amd64/.my.cnf \</span><br><span class="line">  --web.config.file=/data/app/prometheus/mysqld_exporter-0.14.0.linux-amd64/web-config.yml \</span><br><span class="line">  --web.listen-address=:8911 \</span><br><span class="line">  --collect.auto_increment.columns \</span><br><span class="line">  --collect.binlog_size \</span><br><span class="line">  --collect.engine_innodb_status \</span><br><span class="line">  --collect.info_schema.tablestats \</span><br><span class="line">  --collect.info_schema.processlist \</span><br><span class="line">  --collect.info_schema.query_response_time \</span><br><span class="line">  --collect.info_schema.tables.databases=&quot;*&quot; \</span><br><span class="line">  --collect.info_schema.innodb_tablespaces</span><br><span class="line">ExecStop=/bin/kill -KILL $MAINPID</span><br><span class="line">Type=simple</span><br><span class="line">KillMode=control-group</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=15s</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6.启动并配置自动启动</span></span><br><span class="line">systemctl start mysqld_exporter &amp;&amp; systemctl enable mysqld_exporter</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置mysqld-exporter到prometheus"><a href="#配置mysqld-exporter到prometheus" class="headerlink" title="配置mysqld_exporter到prometheus"></a>配置mysqld_exporter到prometheus</h1><figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1.在prometheus.yml下增加mysql</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&#x27;mysqld_exporter&#x27;</span></span><br><span class="line">    <span class="attr">basic_auth:</span></span><br><span class="line">      <span class="attr">username:</span> <span class="string">xxx</span></span><br><span class="line">      <span class="attr">password:</span> <span class="string">xxx</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&#x27;127.0.0.1:8911&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.重启prometheus</span></span><br><span class="line"><span class="string">systemctl</span> <span class="string">restart</span> <span class="string">prometheus</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>prometheus</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>prometheus</tag>
+        <tag>mysqld_exporter</tag>
+      </tags>
   </entry>
   <entry>
     <title>Prometheus之pushgateway</title>
     <url>/posts/9ec87397/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>Prometheus之jvm-exporter</title>
+    <url>/posts/7a55eda5/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>Prometheus之nginx-exporter</title>
+    <url>/posts/390e0286/</url>
+    <content><![CDATA[<p>摘要：Prometheus之nginx-vts-exporter安装配置</p>
+<p>更新内容</p>
+<table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<h1 id="为nginx添加nginx-module-vts模块"><a href="#为nginx添加nginx-module-vts模块" class="headerlink" title="为nginx添加nginx-module-vts模块"></a>为nginx添加nginx-module-vts模块</h1><ul>
+<li><a href="https://github.com/vozlt/nginx-module-vts">官方地址</a></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载nginx-module-vts，需要增加此模块到nginx中</span></span><br><span class="line">wget https://github.com/hnlq715/nginx-vts-exporter/releases/download/v0.10.3/nginx-vts-exporter-0.10.3.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 解压模块 并重新编译nginx</span></span><br><span class="line">tar -zxvf nginx-vts-exporter-0.10.3.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"># </span><span class="language-bash">先获取nginx之前的安装模块命令  nginx -V  然后后面增加--add-module=/data/nginx/nginx-module-vts-0.1.18，在nginx源码包中执行</span></span><br><span class="line">./configure \</span><br><span class="line">…… \</span><br><span class="line">--add-module=/data/nginx/nginx-module-vts-0.1.18 </span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash">编译</span></span><br><span class="line">make</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3. 备份原来nginx的可执行文件，替换新的nginx可执行文件</span></span><br><span class="line">cp /data/nginx/nginx/sbin/nginx /data/nginx/nginx/sbin/nginx.bak</span><br><span class="line">mv /data/nginx/nginx-1.18.0/objs/nginx /data/nginx/nginx/sbin/</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4. nginx -V 检查模块是否增加好，reload nginx</span></span><br><span class="line">nginx -s reload</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 配置nginx配置文件</span> </span><br><span class="line">http &#123;</span><br><span class="line">    vhost_traffic_status_zone;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        location /status &#123;</span><br><span class="line">            vhost_traffic_status_display;</span><br><span class="line">            vhost_traffic_status_display_format html;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">6. reload nginx 并访问web</span></span><br><span class="line">nginx -s reload</span><br><span class="line">http://ip:port</span><br></pre></td></tr></table></figure>
+
+<h1 id="安装部署nginx-vts-exporter"><a href="#安装部署nginx-vts-exporter" class="headerlink" title="安装部署nginx-vts-exporter"></a>安装部署nginx-vts-exporter</h1><ul>
+<li><a href="https://github.com/hnlq715/nginx-vts-exporter">官方地址</a></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1. 下载二进制包并解压</span></span><br><span class="line">wget https://github.com/hnlq715/nginx-vts-exporter/releases/download/v0.10.3/nginx-vts-exporter-0.10.3.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf nginx-vts-exporter-0.10.3.linux-amd64.tar.gz</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">2. 配置系统启动</span></span><br><span class="line">vim /usr/lib/systemd/system/nginx_exporter.service</span><br><span class="line"></span><br><span class="line">[Unit]</span><br><span class="line">Description=nginx_exporter</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/data/wangzw/prometheus/nginx-vts-exporter-0.10.3.linux-amd64/nginx-vts-exporter \</span><br><span class="line">  -nginx.scrape_uri http://localhost/status/format/json \</span><br><span class="line">  -telemetry.address=:18010</span><br><span class="line"></span><br><span class="line">ExecStop=/bin/kill -KILL $MAINPID</span><br><span class="line">Type=simple</span><br><span class="line">KillMode=control-group</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=15s</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">3.启动并配置自动启动</span></span><br><span class="line">systemctl start nginx_exporter &amp;&amp; systemctl enable nginx_exporter</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">4.基于nginx的auth_basic给nginx-vts-exporte的web增加身份验证</span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">使用以下命令生成秘钥文件</span></span><br><span class="line">htpasswd -bc /data/nginx/nginx/conf/conf.d/auth_passwd username password</span><br><span class="line"><span class="meta"># </span><span class="language-bash">配置一个nginx规则</span> </span><br><span class="line">server &#123;</span><br><span class="line"></span><br><span class="line">        listen 8010;</span><br><span class="line">        server_name _;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">        auth_basic &quot;authentication&quot;;</span><br><span class="line">        auth_basic_user_file /data/nginx/nginx/conf/conf.d/auth_passwd;</span><br><span class="line">        proxy_pass http://localhost:18010;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta"># </span><span class="language-bash">检查并reload</span></span><br><span class="line">nginx -t</span><br><span class="line">nginx -s reload</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">5.配置prometheus.yml</span></span><br><span class="line">- job_name: &#x27;nginx_exporter&#x27;</span><br><span class="line">  basic_auth:   #这里加了身份认证，是基于nginx的auth_basic</span><br><span class="line">    username: xxx</span><br><span class="line">    password: xxx</span><br><span class="line">  static_configs:</span><br><span class="line">  - targets: [&#x27;ip:port&#x27;]</span><br><span class="line">  relabel_configs:</span><br><span class="line">   - source_labels: [__address__]</span><br><span class="line">     regex: &#x27;.*&#x27;</span><br><span class="line">     target_label: instance</span><br><span class="line">     replacement: &#x27;ip:port&#x27;</span><br><span class="line">    </span><br><span class="line"><span class="meta"># </span><span class="language-bash">5. 配置grafana模板，这里使用官方推荐2949</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>prometheus</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>prometheus</tag>
+        <tag>nginx-vts-exporter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Prometheus之oracle_exporter</title>
+    <url>/posts/5c5dad5c/</url>
+    <content><![CDATA[<p>摘要：Prometheus之oracledb_exporter安装配置</p>
+<p>更新内容</p>
+<table>
+<thead>
+<tr>
+<th align="center">日期</th>
+<th align="center">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2022-04</td>
+<td align="center">新建文档</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta"># </span><span class="language-bash">1.下载解压</span></span><br><span class="line">wget https://github.com/iamseth/oracledb_exporter/releases/download/0.3.0rc1/oracledb_exporter.0.3.0rc1-ora18.5.linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run -d --name oracledb_exporter --restart=always -p 8913:9161 -e DATA_SOURCE_NAME=system/8ZqoL0peW37iV9TG@124.70.166.157:1521/UPaySvr iamseth/oracledb_exporter</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>prometheus</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>prometheus</tag>
+        <tag>oracledb_exporter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Prometheus之redis-exporter</title>
+    <url>/posts/5a61f516/</url>
     <content><![CDATA[]]></content>
   </entry>
 </search>

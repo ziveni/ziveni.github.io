@@ -6,7 +6,7 @@
   <link href="https://ziveni.github.io/atom.xml" rel="self"/>
   
   <link href="https://ziveni.github.io/"/>
-  <updated>2022-04-20T03:54:10.285Z</updated>
+  <updated>2022-08-08T06:24:08.276Z</updated>
   <id>https://ziveni.github.io/</id>
   
   <author>
@@ -17,15 +17,136 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Prometheus之oracle_exporter</title>
+    <link href="https://ziveni.github.io/posts/5c5dad5c/"/>
+    <id>https://ziveni.github.io/posts/5c5dad5c/</id>
+    <published>2022-04-22T09:18:24.000Z</published>
+    <updated>2022-08-08T06:24:08.276Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;摘要：Prometheus之oracledb_exporter安装配置&lt;/p&gt;
+&lt;p&gt;更新内容&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="prometheus" scheme="https://ziveni.github.io/categories/prometheus/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="prometheus" scheme="https://ziveni.github.io/tags/prometheus/"/>
+    
+    <category term="oracledb_exporter" scheme="https://ziveni.github.io/tags/oracledb-exporter/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Prometheus之jvm-exporter</title>
+    <link href="https://ziveni.github.io/posts/7a55eda5/"/>
+    <id>https://ziveni.github.io/posts/7a55eda5/</id>
+    <published>2022-04-21T03:14:46.000Z</published>
+    <updated>2022-08-08T06:24:08.273Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Prometheus之redis-exporter</title>
+    <link href="https://ziveni.github.io/posts/5a61f516/"/>
+    <id>https://ziveni.github.io/posts/5a61f516/</id>
+    <published>2022-04-21T03:13:44.000Z</published>
+    <updated>2022-08-08T06:24:08.276Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Prometheus之nginx-exporter</title>
+    <link href="https://ziveni.github.io/posts/390e0286/"/>
+    <id>https://ziveni.github.io/posts/390e0286/</id>
+    <published>2022-04-21T03:13:27.000Z</published>
+    <updated>2022-08-08T06:24:08.274Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;摘要：Prometheus之nginx-vts-exporter安装配置&lt;/p&gt;
+&lt;p&gt;更新内容&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    <category term="prometheus" scheme="https://ziveni.github.io/categories/prometheus/"/>
+    
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="prometheus" scheme="https://ziveni.github.io/tags/prometheus/"/>
+    
+    <category term="nginx-vts-exporter" scheme="https://ziveni.github.io/tags/nginx-vts-exporter/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Prometheus之mysqld_exporter</title>
     <link href="https://ziveni.github.io/posts/60592cec/"/>
     <id>https://ziveni.github.io/posts/60592cec/</id>
     <published>2022-04-20T03:54:10.000Z</published>
-    <updated>2022-04-20T03:54:10.285Z</updated>
+    <updated>2022-05-13T05:49:47.563Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;摘要：Prometheus之mysqld_exporter安装配置&lt;/p&gt;
+&lt;p&gt;更新内容&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&quot;center&quot;&gt;日期&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
     
     
     
+    <category term="prometheus" scheme="https://ziveni.github.io/categories/prometheus/"/>
     
+    
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    
+    <category term="prometheus" scheme="https://ziveni.github.io/tags/prometheus/"/>
+    
+    <category term="mysqld_exporter" scheme="https://ziveni.github.io/tags/mysqld-exporter/"/>
     
   </entry>
   
@@ -34,7 +155,7 @@
     <link href="https://ziveni.github.io/posts/9ec87397/"/>
     <id>https://ziveni.github.io/posts/9ec87397/</id>
     <published>2022-04-20T03:53:47.000Z</published>
-    <updated>2022-04-20T03:53:47.765Z</updated>
+    <updated>2022-04-20T05:34:39.456Z</updated>
     
     
     
@@ -43,14 +164,14 @@
   </entry>
   
   <entry>
-    <title>Prometheus之Altermanager</title>
+    <title>Prometheus之Alertmanager</title>
     <link href="https://ziveni.github.io/posts/be093ac/"/>
     <id>https://ziveni.github.io/posts/be093ac/</id>
     <published>2022-04-20T03:53:18.000Z</published>
-    <updated>2022-04-20T03:57:43.642Z</updated>
+    <updated>2022-04-21T10:00:18.812Z</updated>
     
     
-    <summary type="html">&lt;p&gt;摘要：Prometheus之Altermanager安装配置&lt;/p&gt;
+    <summary type="html">&lt;p&gt;摘要：Prometheus之Alertmanager安装配置&lt;/p&gt;
 &lt;p&gt;更新内容&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -72,7 +193,7 @@
     
     <category term="Prometheus" scheme="https://ziveni.github.io/tags/Prometheus/"/>
     
-    <category term="Altermanager" scheme="https://ziveni.github.io/tags/Altermanager/"/>
+    <category term="Alertmanager" scheme="https://ziveni.github.io/tags/Alertmanager/"/>
     
   </entry>
   
@@ -119,7 +240,7 @@
     <link href="https://ziveni.github.io/posts/2047dd97/"/>
     <id>https://ziveni.github.io/posts/2047dd97/</id>
     <published>2022-04-18T02:56:51.000Z</published>
-    <updated>2022-04-20T05:34:22.360Z</updated>
+    <updated>2022-05-13T07:31:38.503Z</updated>
     
     
     <summary type="html">&lt;p&gt;摘要：Prometheus+Grafana部署系统监控&lt;/p&gt;
@@ -464,7 +585,7 @@
     <link href="https://ziveni.github.io/posts/f6030cf0/"/>
     <id>https://ziveni.github.io/posts/f6030cf0/</id>
     <published>2022-02-17T09:37:26.000Z</published>
-    <updated>2022-04-01T09:03:46.826Z</updated>
+    <updated>2022-06-12T08:22:26.238Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;a href=&quot;#摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot; class=&quot;headerlink&quot; title=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;/a&gt;摘要：redis在linux下的安装部署，哨兵模式，集群模式&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
