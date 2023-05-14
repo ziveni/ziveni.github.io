@@ -240,7 +240,7 @@
     <link href="https://ziveni.github.io/posts/2047dd97/"/>
     <id>https://ziveni.github.io/posts/2047dd97/</id>
     <published>2022-04-18T02:56:51.000Z</published>
-    <updated>2022-05-13T07:31:38.503Z</updated>
+    <updated>2023-04-13T15:07:24.447Z</updated>
     
     
     <summary type="html">&lt;p&gt;摘要：Prometheus+Grafana部署系统监控&lt;/p&gt;
@@ -364,6 +364,8 @@
     <category term="docker" scheme="https://ziveni.github.io/categories/docker/"/>
     
     
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    
     <category term="docker" scheme="https://ziveni.github.io/tags/docker/"/>
     
     <category term="Harbor" scheme="https://ziveni.github.io/tags/Harbor/"/>
@@ -371,8 +373,6 @@
     <category term="register" scheme="https://ziveni.github.io/tags/register/"/>
     
     <category term="rancher" scheme="https://ziveni.github.io/tags/rancher/"/>
-    
-    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
     
   </entry>
   
@@ -572,11 +572,11 @@
     <category term="oracle" scheme="https://ziveni.github.io/categories/oracle/"/>
     
     
-    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
+    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
     
     <category term="oracle" scheme="https://ziveni.github.io/tags/oracle/"/>
     
-    <category term="centos" scheme="https://ziveni.github.io/tags/centos/"/>
+    <category term="linux" scheme="https://ziveni.github.io/tags/linux/"/>
     
   </entry>
   
@@ -585,7 +585,7 @@
     <link href="https://ziveni.github.io/posts/f6030cf0/"/>
     <id>https://ziveni.github.io/posts/f6030cf0/</id>
     <published>2022-02-17T09:37:26.000Z</published>
-    <updated>2022-06-12T08:22:26.238Z</updated>
+    <updated>2023-03-14T03:19:24.074Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;a href=&quot;#摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot; class=&quot;headerlink&quot; title=&quot;摘要：redis在linux下的安装部署，哨兵模式，集群模式&quot;&gt;&lt;/a&gt;摘要：redis在linux下的安装部署，哨兵模式，集群模式&lt;/h3&gt;&lt;h3 id=&quot;更新内容&quot;&gt;&lt;a href=&quot;#更新内容&quot; class=&quot;headerlink&quot; title=&quot;更新内容&quot;&gt;&lt;/a&gt;更新内容&lt;/h3&gt;&lt;table&gt;
