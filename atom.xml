@@ -236,11 +236,11 @@
   </entry>
   
   <entry>
-    <title>Prometheus+Grafana部署系统监控</title>
+    <title>Prometheus+node_exporter+Grafana部署系统监控</title>
     <link href="https://ziveni.github.io/posts/2047dd97/"/>
     <id>https://ziveni.github.io/posts/2047dd97/</id>
     <published>2022-04-18T02:56:51.000Z</published>
-    <updated>2023-04-13T15:07:24.447Z</updated>
+    <updated>2023-05-22T02:52:03.692Z</updated>
     
     
     <summary type="html">&lt;p&gt;摘要：Prometheus+Grafana部署系统监控&lt;/p&gt;
@@ -256,7 +256,19 @@
 &lt;td align=&quot;center&quot;&gt;2022-04&lt;/td&gt;
 &lt;td align=&quot;center&quot;&gt;新建文档&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;</summary>
+&lt;tr&gt;
+&lt;td align=&quot;center&quot;&gt;2023-05-22&lt;/td&gt;
+&lt;td align=&quot;center&quot;&gt;新增node_exporter在centos6中开机自启配置&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;h1 id=&quot;prometheus-简单介绍&quot;&gt;&lt;a href=&quot;#prometheus-简单介绍&quot; class=&quot;headerlink&quot; title=&quot;prometheus 简单介绍&quot;&gt;&lt;/a&gt;prometheus 简单介绍&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;官网: &lt;a href=&quot;https://prometheus.io/&quot;&gt;prometheus.io&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;架构&quot;&gt;&lt;a href=&quot;#架构&quot; class=&quot;headerlink&quot; title=&quot;架构&quot;&gt;&lt;/a&gt;架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://ziveni.oss-cn-beijing.aliyuncs.com/img/202204191419769.png&quot; alt=&quot;普罗米修斯架构&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Prometheus Server：&lt;/strong&gt; 用于收集和存储时间序列化数据&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Exporters：&lt;/strong&gt;将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server，Prometheus Server通过访问该Exporter提供的Endpoint端点，即可以获取到需要采集的监控数据&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Pushgateway：&lt;/strong&gt;主要是实现接收由 Client push 过来的指标数据，在指定的时间间隔，由主程序来抓取。由于 Prometheus 数据采集基于 Pull 模型进行设计，因此在网络环境的配置上必须要让 Prometheus Server 能够直接与 Exporter 进行通信。当这种网络需求无法直接满足时，就可以利用 PushGateway 来进行中转。可以通过 PushGateway 将内部网络的监控数据主动 Push 到 Gateway 当中。而 Prometheus Server 则可以采用同样 Pull 的方式从 PushGateway 中获取到监控数据&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Altermanager：&lt;/strong&gt; 在Prometheus Server中支持基于Prom QL创建告警规则，如果满足Prom QL定义的规则，则会产生一条告警。当AlertManager从 Prometheus server 端接收到 alerts后，会进行去重，分组，并路由到相应的接收方，发出报警。&lt;/p&gt;</summary>
     
     
     
@@ -268,6 +280,8 @@
     <category term="Prometheus" scheme="https://ziveni.github.io/tags/Prometheus/"/>
     
     <category term="Grafana" scheme="https://ziveni.github.io/tags/Grafana/"/>
+    
+    <category term="node_exporter" scheme="https://ziveni.github.io/tags/node-exporter/"/>
     
   </entry>
   
